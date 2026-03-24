@@ -1,27 +1,26 @@
 <template>
   <div class="blog-detail">
     <!-- 加载状态 -->
-    <div v-if="loading" class="loading">正在加载文章...</div>
+    <div v-if="loading" class="loading">&gt; LOADING QUEST DATA...</div>
 
     <!-- 错误状态 -->
     <div v-else-if="error" class="error-state container">
-      <div class="emoji">😔</div>
+      <div class="emoji">💀</div>
       <p>{{ error }}</p>
-      <button class="btn btn-outline" style="margin-top:20px" @click="router.back()">← 返回</button>
+      <button class="btn btn-outline" style="margin-top:20px" @click="router.back()">&lt;&lt; BACK</button>
     </div>
 
     <!-- 文章内容 -->
     <div v-else-if="currentPost" class="article-wrapper">
       <!-- 文章头部 -->
       <div class="article-hero">
-        <div class="article-hero-bg"></div>
         <div class="article-header container">
-          <button class="back-btn" @click="router.back()">← 返回列表</button>
+          <button class="back-btn" @click="router.back()">&lt;&lt; BACK TO LIST</button>
           <div class="article-meta">
             <span class="article-category">{{ currentPost.category }}</span>
             <span class="article-date">{{ formatDate(currentPost.createdAt) }}</span>
             <span v-if="currentPost.updatedAt !== currentPost.createdAt" class="article-updated">
-              更新于 {{ formatDate(currentPost.updatedAt) }}
+              UPDATED: {{ formatDate(currentPost.updatedAt) }}
             </span>
           </div>
           <h1 class="article-title">{{ currentPost.title }}</h1>
@@ -39,8 +38,8 @@
 
         <!-- 文章底部导航 -->
         <div class="article-nav">
-          <button class="btn btn-outline" @click="router.push('/blog')">← 博客列表</button>
-          <router-link to="/admin" class="btn btn-outline">✏️ 编辑文章</router-link>
+          <button class="btn btn-outline" @click="router.push('/blog')">&lt;&lt; BLOG LIST</button>
+          <router-link to="/admin" class="btn btn-outline">EDIT POST</router-link>
         </div>
       </div>
     </div>
@@ -101,21 +100,12 @@ function formatDate(dateStr) {
   min-height: 80vh;
 }
 
-/* 文章头部 Hero */
+/* 文章头部 */
 .article-hero {
   position: relative;
-  padding: 60px 0 50px;
-  margin-bottom: 40px;
-  overflow: hidden;
-}
-
-.article-hero-bg {
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(ellipse at 50% 50%,
-    rgba(15, 52, 96, 0.5) 0%,
-    transparent 70%
-  );
+  padding: 50px 0 40px;
+  margin-bottom: 32px;
+  border-bottom: 3px dashed var(--pixel-border);
 }
 
 .article-header {
@@ -126,18 +116,20 @@ function formatDate(dateStr) {
 
 .back-btn {
   background: none;
-  border: none;
+  border: 2px solid var(--pixel-border);
   color: var(--color-text-secondary);
   cursor: pointer;
-  font-size: 0.9rem;
-  padding: 6px 0;
+  font-size: 0.6rem;
+  padding: 6px 12px;
   margin-bottom: 24px;
-  transition: all 0.3s;
-  font-family: inherit;
+  transition: all 0.1s steps(2);
+  font-family: 'Press Start 2P', monospace;
 }
 
 .back-btn:hover {
-  color: var(--color-gold);
+  color: var(--color-green);
+  border-color: var(--color-green);
+  text-shadow: 0 0 6px rgba(0, 255, 65, 0.3);
 }
 
 .article-meta {
@@ -149,29 +141,25 @@ function formatDate(dateStr) {
 }
 
 .article-category {
-  font-size: 0.85rem;
+  font-size: 0.55rem;
   color: var(--color-accent);
-  background: rgba(233, 69, 96, 0.12);
-  padding: 3px 12px;
-  border-radius: 9999px;
-  border: 1px solid rgba(233, 69, 96, 0.3);
+  background: rgba(255, 107, 157, 0.12);
+  padding: 3px 10px;
+  border: 2px solid rgba(255, 107, 157, 0.3);
 }
 
 .article-date,
 .article-updated {
-  font-size: 0.85rem;
+  font-size: 0.55rem;
   color: var(--color-text-muted);
 }
 
 .article-title {
-  font-size: clamp(1.6rem, 4vw, 2.5rem);
-  font-weight: 700;
-  line-height: 1.4;
+  font-size: clamp(1rem, 3vw, 1.6rem);
+  line-height: 1.8;
   margin-bottom: 20px;
-  background: linear-gradient(135deg, var(--color-text-primary) 60%, var(--color-gold));
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
+  color: var(--color-green);
+  text-shadow: 0 0 10px rgba(0, 255, 65, 0.3);
 }
 
 .article-tags {
@@ -186,7 +174,7 @@ function formatDate(dateStr) {
 }
 
 .article-content {
-  padding: 40px 48px;
+  padding: 32px 40px;
   max-width: 860px;
   margin: 0 auto;
 }
@@ -213,7 +201,7 @@ function formatDate(dateStr) {
 
 @media (max-width: 768px) {
   .article-content {
-    padding: 24px 20px;
+    padding: 20px 16px;
   }
 
   .article-nav {

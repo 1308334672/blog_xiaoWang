@@ -2,8 +2,8 @@
   <div class="blog-page container">
     <!-- 页面标题 -->
     <div class="page-header">
-      <h1 class="page-title gradient-text">博客文章</h1>
-      <p class="page-desc">探索技术与思考的边界</p>
+      <h1 class="page-title">&gt; BLOG_ARCHIVE</h1>
+      <p class="page-desc">// 探索技术与思考的边界</p>
     </div>
 
     <!-- 搜索栏 -->
@@ -12,17 +12,17 @@
         v-model="searchQuery"
         class="input-field search-input"
         type="text"
-        placeholder="🔍 搜索文章标题或内容..."
+        placeholder="> SEARCH..."
         @input="handleSearch"
       />
       <select v-model="selectedCategory" class="input-field category-select" @change="handleSearch">
-        <option value="">全部分类</option>
+        <option value="">ALL</option>
         <option v-for="cat in categories" :key="cat" :value="cat">{{ cat }}</option>
       </select>
     </div>
 
     <!-- 加载状态 -->
-    <div v-if="loading" class="loading">正在加载文章...</div>
+    <div v-if="loading" class="loading">&gt; LOADING DATA...</div>
 
     <!-- 文章列表 -->
     <div v-else-if="posts.length">
@@ -43,7 +43,7 @@
             <div class="post-tags">
               <span v-for="tag in post.tags.slice(0, 4)" :key="tag" class="tag">{{ tag }}</span>
             </div>
-            <span class="read-link">阅读全文 →</span>
+            <span class="read-link">&gt;&gt; ENTER</span>
           </div>
         </article>
       </div>
@@ -54,25 +54,25 @@
           class="btn btn-outline page-btn"
           :disabled="currentPage <= 1"
           @click="goToPage(currentPage - 1)"
-        >← 上一页</button>
+        >&lt;&lt; PREV</button>
 
-        <span class="page-info">第 {{ currentPage }} / {{ totalPages }} 页，共 {{ total }} 篇</span>
+        <span class="page-info">PAGE {{ currentPage }}/{{ totalPages }} | TOTAL: {{ total }}</span>
 
         <button
           class="btn btn-outline page-btn"
           :disabled="currentPage >= totalPages"
           @click="goToPage(currentPage + 1)"
-        >下一页 →</button>
+        >NEXT &gt;&gt;</button>
       </div>
 
-      <p v-else class="total-count">共 {{ total }} 篇文章</p>
+      <p v-else class="total-count">TOTAL: {{ total }} POSTS</p>
     </div>
 
     <!-- 空状态 -->
     <div v-else class="empty-state">
-      <div class="emoji">🔭</div>
-      <p>没有找到相关文章</p>
-      <button v-if="searchQuery || selectedCategory" class="btn btn-outline" style="margin-top:16px" @click="clearSearch">清除筛选</button>
+      <div class="emoji">�</div>
+      <p>NO RESULTS FOUND</p>
+      <button v-if="searchQuery || selectedCategory" class="btn btn-outline" style="margin-top:16px" @click="clearSearch">CLEAR FILTER</button>
     </div>
   </div>
 </template>
@@ -145,13 +145,15 @@ function goToPage(page) {
 }
 
 .page-title {
-  font-size: 2.5rem;
-  font-weight: 700;
+  font-size: 1.4rem;
+  color: var(--color-green);
+  text-shadow: 0 0 10px rgba(0, 255, 65, 0.3);
   margin-bottom: 10px;
 }
 
 .page-desc {
-  color: var(--color-text-secondary);
+  color: var(--color-text-muted);
+  font-size: 0.6rem;
 }
 
 /* 搜索栏 */
@@ -172,25 +174,30 @@ function goToPage(page) {
   width: auto;
   min-width: 140px;
   cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Cpath d='M0 2h8L4 7z' fill='%2300ff41'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 32px;
 }
 
 /* 文章列表 */
 .posts-list {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 16px;
 }
 
 .post-item {
-  padding: 28px 32px;
+  padding: 24px 28px;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.1s steps(2);
 }
 
 .post-item:hover {
-  transform: translateX(4px);
-  border-color: rgba(241, 196, 15, 0.3);
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+  transform: translate(-2px, -2px);
+  border-color: var(--color-green);
+  box-shadow: 6px 6px 0px rgba(0, 255, 65, 0.15);
 }
 
 .post-meta {
@@ -201,40 +208,40 @@ function goToPage(page) {
 }
 
 .post-category {
-  font-size: 0.8rem;
+  font-size: 0.55rem;
   color: var(--color-accent);
-  background: rgba(233, 69, 96, 0.12);
-  padding: 2px 10px;
-  border-radius: 9999px;
-  border: 1px solid rgba(233, 69, 96, 0.25);
+  background: rgba(255, 107, 157, 0.12);
+  padding: 2px 8px;
+  border: 2px solid rgba(255, 107, 157, 0.3);
 }
 
 .post-date {
-  font-size: 0.8rem;
+  font-size: 0.55rem;
   color: var(--color-text-muted);
 }
 
 .post-title {
-  font-size: 1.3rem;
-  font-weight: 600;
+  font-size: 0.85rem;
   margin-bottom: 10px;
   color: var(--color-text-primary);
-  transition: color 0.3s;
+  transition: all 0.1s steps(2);
 }
 
 .post-item:hover .post-title {
-  color: var(--color-gold);
+  color: var(--color-green);
+  text-shadow: 0 0 6px rgba(0, 255, 65, 0.3);
 }
 
 .post-summary {
-  font-size: 0.93rem;
+  font-size: 0.65rem;
   color: var(--color-text-secondary);
-  line-height: 1.8;
-  margin-bottom: 16px;
+  line-height: 2;
+  margin-bottom: 14px;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
+  font-family: 'Courier New', monospace;
 }
 
 .post-footer {
@@ -250,13 +257,12 @@ function goToPage(page) {
 }
 
 .read-link {
-  font-size: 0.85rem;
-  color: var(--color-gold);
-  transition: all 0.3s;
+  font-size: 0.6rem;
+  color: var(--color-green);
 }
 
 .post-item:hover .read-link {
-  letter-spacing: 1px;
+  animation: blink-cursor 0.8s steps(2) infinite;
 }
 
 /* 分页 */
@@ -264,27 +270,27 @@ function goToPage(page) {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 20px;
+  gap: 16px;
   margin-top: 48px;
   flex-wrap: wrap;
 }
 
 .page-btn:disabled {
-  opacity: 0.4;
+  opacity: 0.3;
   cursor: not-allowed;
   transform: none !important;
 }
 
 .page-info {
   color: var(--color-text-secondary);
-  font-size: 0.9rem;
+  font-size: 0.6rem;
 }
 
 .total-count {
   text-align: center;
   margin-top: 32px;
   color: var(--color-text-muted);
-  font-size: 0.9rem;
+  font-size: 0.6rem;
 }
 
 @media (max-width: 640px) {
@@ -297,7 +303,7 @@ function goToPage(page) {
   }
 
   .post-item {
-    padding: 20px;
+    padding: 16px;
   }
 }
 </style>

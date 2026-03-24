@@ -4,21 +4,21 @@
     <div v-if="!isLoggedIn" class="login-panel">
       <div class="login-card glass-card">
         <div class="login-icon">🔐</div>
-        <h2 class="login-title">管理员登录</h2>
-        <p class="login-desc">请输入管理密码以访问后台</p>
+        <h2 class="login-title">&gt; ADMIN LOGIN</h2>
+        <p class="login-desc">INPUT PASSWORD TO ACCESS</p>
         <form @submit.prevent="handleLogin">
           <div class="form-group">
             <input
               v-model="loginPassword"
               type="password"
               class="input-field"
-              placeholder="输入密码（默认: admin123）"
+              placeholder="> PASSWORD..."
               autofocus
             />
           </div>
           <div v-if="loginError" class="error-msg">{{ loginError }}</div>
           <button type="submit" class="btn btn-primary full-width" :disabled="loginLoading">
-            {{ loginLoading ? '登录中...' : '✨ 登录' }}
+            {{ loginLoading ? 'LOADING...' : 'LOGIN' }}
           </button>
         </form>
       </div>
@@ -28,26 +28,26 @@
     <div v-else class="admin-content">
       <!-- 顶部栏 -->
       <div class="admin-header">
-        <h1 class="admin-title gradient-text">✨ 博客管理后台</h1>
-        <button class="btn btn-outline" @click="handleLogout">退出登录</button>
+        <h1 class="admin-title">&gt; ADMIN PANEL</h1>
+        <button class="btn btn-outline" @click="handleLogout">LOGOUT</button>
       </div>
 
       <!-- 操作按钮 -->
       <div class="admin-actions">
-        <button class="btn btn-primary" @click="openCreate">+ 新建文章</button>
+        <button class="btn btn-primary" @click="openCreate">+ NEW POST</button>
       </div>
 
       <!-- 提示消息 -->
       <div v-if="toast.show" class="toast" :class="toast.type">{{ toast.message }}</div>
 
       <!-- 文章列表 -->
-      <div v-if="loading" class="loading">正在加载...</div>
+      <div v-if="loading" class="loading">&gt; LOADING...</div>
       <div v-else-if="posts.length" class="posts-table glass-card">
         <div class="table-header">
-          <span class="col-title">标题</span>
-          <span class="col-category">分类</span>
-          <span class="col-date">日期</span>
-          <span class="col-actions">操作</span>
+          <span class="col-title">TITLE</span>
+          <span class="col-category">CATEGORY</span>
+          <span class="col-date">DATE</span>
+          <span class="col-actions">ACTIONS</span>
         </div>
         <div v-for="post in posts" :key="post.id" class="table-row">
           <span class="col-title post-title-cell">{{ post.title }}</span>
@@ -56,21 +56,21 @@
           </span>
           <span class="col-date">{{ formatDate(post.createdAt) }}</span>
           <span class="col-actions">
-            <button class="btn btn-outline btn-sm" @click="openEdit(post.id)">编辑</button>
-            <button class="btn btn-danger btn-sm" @click="confirmDelete(post)">删除</button>
+            <button class="btn btn-outline btn-sm" @click="openEdit(post.id)">EDIT</button>
+            <button class="btn btn-danger btn-sm" @click="confirmDelete(post)">DEL</button>
           </span>
         </div>
       </div>
       <div v-else class="empty-state">
         <div class="emoji">📝</div>
-        <p>还没有文章，点击「新建文章」开始写作吧！</p>
+        <p>NO POSTS YET. CREATE ONE!</p>
       </div>
 
       <!-- 分页 -->
       <div v-if="totalPages > 1" class="pagination">
-        <button class="btn btn-outline" :disabled="currentPage <= 1" @click="loadPage(currentPage - 1)">← 上一页</button>
-        <span style="color: var(--color-text-secondary); font-size: 0.9rem">第 {{ currentPage }} / {{ totalPages }} 页</span>
-        <button class="btn btn-outline" :disabled="currentPage >= totalPages" @click="loadPage(currentPage + 1)">下一页 →</button>
+        <button class="btn btn-outline" :disabled="currentPage <= 1" @click="loadPage(currentPage - 1)">&lt;&lt; PREV</button>
+        <span style="color: var(--color-text-secondary); font-size: 0.6rem">PAGE {{ currentPage }}/{{ totalPages }}</span>
+        <button class="btn btn-outline" :disabled="currentPage >= totalPages" @click="loadPage(currentPage + 1)">NEXT &gt;&gt;</button>
       </div>
     </div>
 
@@ -78,41 +78,41 @@
     <div v-if="showEditor" class="modal-overlay" @click.self="closeEditor">
       <div class="modal glass-card">
         <div class="modal-header">
-          <h3>{{ editingId ? '编辑文章' : '新建文章' }}</h3>
-          <button class="close-btn" @click="closeEditor">✕</button>
+          <h3>{{ editingId ? 'EDIT POST' : 'NEW POST' }}</h3>
+          <button class="close-btn" @click="closeEditor">X</button>
         </div>
         <div class="modal-body">
           <div class="form-group">
-            <label>标题 *</label>
-            <input v-model="form.title" class="input-field" placeholder="文章标题" />
+            <label>TITLE *</label>
+            <input v-model="form.title" class="input-field" placeholder="Post title" />
           </div>
           <div class="form-row">
             <div class="form-group">
-              <label>分类</label>
-              <input v-model="form.category" class="input-field" placeholder="如: 前端开发" list="category-list" />
+              <label>CATEGORY</label>
+              <input v-model="form.category" class="input-field" placeholder="e.g. 前端开发" list="category-list" />
               <datalist id="category-list">
                 <option v-for="c in categoryOptions" :key="c" :value="c" />
               </datalist>
             </div>
             <div class="form-group">
-              <label>标签（逗号分隔）</label>
+              <label>TAGS (comma sep)</label>
               <input v-model="form.tags" class="input-field" placeholder="Vue3, JavaScript" />
             </div>
           </div>
           <div class="form-group">
-            <label>摘要</label>
-            <input v-model="form.summary" class="input-field" placeholder="文章摘要（选填，自动从内容截取）" />
+            <label>SUMMARY</label>
+            <input v-model="form.summary" class="input-field" placeholder="Optional summary" />
           </div>
           <div class="form-group">
-            <label>内容（Markdown）*</label>
-            <textarea v-model="form.content" class="input-field content-editor" placeholder="支持 Markdown 格式..."></textarea>
+            <label>CONTENT (Markdown) *</label>
+            <textarea v-model="form.content" class="input-field content-editor" placeholder="Write in Markdown..."></textarea>
           </div>
           <div v-if="formError" class="error-msg">{{ formError }}</div>
         </div>
         <div class="modal-footer">
-          <button class="btn btn-outline" @click="closeEditor">取消</button>
+          <button class="btn btn-outline" @click="closeEditor">CANCEL</button>
           <button class="btn btn-primary" :disabled="submitting" @click="handleSubmit">
-            {{ submitting ? '保存中...' : (editingId ? '保存修改' : '发布文章') }}
+            {{ submitting ? 'SAVING...' : (editingId ? 'SAVE' : 'PUBLISH') }}
           </button>
         </div>
       </div>
@@ -122,18 +122,18 @@
     <div v-if="deleteTarget" class="modal-overlay" @click.self="deleteTarget = null">
       <div class="modal modal-sm glass-card">
         <div class="modal-header">
-          <h3>确认删除</h3>
-          <button class="close-btn" @click="deleteTarget = null">✕</button>
+          <h3>CONFIRM DELETE</h3>
+          <button class="close-btn" @click="deleteTarget = null">X</button>
         </div>
         <div class="modal-body">
           <p style="color: var(--color-text-secondary)">
-            确定要删除「<strong style="color: var(--color-text-primary)">{{ deleteTarget.title }}</strong>」吗？此操作无法撤销。
+            DELETE「<strong style="color: var(--color-accent)">{{ deleteTarget.title }}</strong>」? THIS CANNOT BE UNDONE.
           </p>
         </div>
         <div class="modal-footer">
-          <button class="btn btn-outline" @click="deleteTarget = null">取消</button>
+          <button class="btn btn-outline" @click="deleteTarget = null">CANCEL</button>
           <button class="btn btn-danger" :disabled="submitting" @click="handleDelete">
-            {{ submitting ? '删除中...' : '确认删除' }}
+            {{ submitting ? 'DELETING...' : 'DELETE' }}
           </button>
         </div>
       </div>
@@ -318,30 +318,37 @@ function showToast(message, type = 'success') {
 .login-card {
   width: 100%;
   max-width: 400px;
-  padding: 48px 40px;
+  padding: 40px 32px;
   text-align: center;
 }
 
 .login-icon {
-  font-size: 3rem;
+  font-size: 2.5rem;
   margin-bottom: 16px;
-  animation: float 3s ease-in-out infinite;
 }
 
 .login-title {
-  font-size: 1.5rem;
-  font-weight: 700;
+  font-size: 1rem;
   margin-bottom: 8px;
+  color: var(--color-green);
+  text-shadow: 0 0 8px rgba(0, 255, 65, 0.3);
 }
 
 .login-desc {
-  color: var(--color-text-secondary);
-  margin-bottom: 28px;
-  font-size: 0.9rem;
+  color: var(--color-text-muted);
+  margin-bottom: 24px;
+  font-size: 0.55rem;
 }
 
 .form-group {
-  margin-bottom: 16px;
+  margin-bottom: 14px;
+}
+
+.form-group label {
+  display: block;
+  font-size: 0.6rem;
+  color: var(--color-cyan);
+  margin-bottom: 6px;
 }
 
 .full-width {
@@ -352,11 +359,11 @@ function showToast(message, type = 'success') {
 
 .error-msg {
   color: var(--color-accent);
-  font-size: 0.85rem;
+  font-size: 0.6rem;
   margin: 8px 0;
   padding: 8px 12px;
-  background: rgba(233, 69, 96, 0.1);
-  border-radius: var(--radius-sm);
+  background: rgba(255, 107, 157, 0.1);
+  border: 2px solid rgba(255, 107, 157, 0.3);
 }
 
 /* 管理后台 */
@@ -364,14 +371,15 @@ function showToast(message, type = 'success') {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 28px;
+  margin-bottom: 24px;
   flex-wrap: wrap;
   gap: 16px;
 }
 
 .admin-title {
-  font-size: 1.8rem;
-  font-weight: 700;
+  font-size: 1.1rem;
+  color: var(--color-green);
+  text-shadow: 0 0 8px rgba(0, 255, 65, 0.3);
 }
 
 .admin-actions {
@@ -380,21 +388,21 @@ function showToast(message, type = 'success') {
 
 /* Toast */
 .toast {
-  padding: 12px 20px;
-  border-radius: var(--radius-md);
-  font-size: 0.9rem;
-  margin-bottom: 20px;
+  padding: 10px 16px;
+  font-size: 0.6rem;
+  margin-bottom: 16px;
+  border: 2px solid;
 }
 
 .toast.success {
-  background: rgba(46, 204, 113, 0.15);
-  border: 1px solid rgba(46, 204, 113, 0.3);
-  color: #2ecc71;
+  background: rgba(0, 255, 65, 0.1);
+  border-color: rgba(0, 255, 65, 0.3);
+  color: var(--color-green);
 }
 
 .toast.error {
-  background: rgba(233, 69, 96, 0.15);
-  border: 1px solid rgba(233, 69, 96, 0.3);
+  background: rgba(255, 107, 157, 0.1);
+  border-color: rgba(255, 107, 157, 0.3);
   color: var(--color-accent);
 }
 
@@ -406,22 +414,21 @@ function showToast(message, type = 'success') {
 .table-header,
 .table-row {
   display: grid;
-  grid-template-columns: 1fr 120px 100px 160px;
-  gap: 12px;
-  padding: 14px 20px;
+  grid-template-columns: 1fr 100px 90px 140px;
+  gap: 10px;
+  padding: 12px 16px;
   align-items: center;
 }
 
 .table-header {
-  font-size: 0.85rem;
-  color: var(--color-text-muted);
-  border-bottom: 1px solid var(--glass-border);
-  font-weight: 600;
+  font-size: 0.6rem;
+  color: var(--color-cyan);
+  border-bottom: 3px solid var(--pixel-border);
 }
 
 .table-row {
-  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
-  transition: background 0.2s;
+  border-bottom: 1px dashed var(--pixel-border);
+  transition: background 0.1s steps(2);
 }
 
 .table-row:last-child {
@@ -429,11 +436,11 @@ function showToast(message, type = 'success') {
 }
 
 .table-row:hover {
-  background: rgba(255, 255, 255, 0.03);
+  background: rgba(0, 255, 65, 0.03);
 }
 
 .post-title-cell {
-  font-size: 0.93rem;
+  font-size: 0.65rem;
   color: var(--color-text-primary);
   overflow: hidden;
   text-overflow: ellipsis;
@@ -441,27 +448,26 @@ function showToast(message, type = 'success') {
 }
 
 .post-category {
-  font-size: 0.78rem;
+  font-size: 0.5rem;
   color: var(--color-accent);
-  background: rgba(233, 69, 96, 0.12);
-  padding: 2px 8px;
-  border-radius: 9999px;
-  border: 1px solid rgba(233, 69, 96, 0.25);
+  background: rgba(255, 107, 157, 0.12);
+  padding: 2px 6px;
+  border: 1px solid rgba(255, 107, 157, 0.3);
 }
 
 .col-date {
-  font-size: 0.82rem;
+  font-size: 0.55rem;
   color: var(--color-text-muted);
 }
 
 .col-actions {
   display: flex;
-  gap: 8px;
+  gap: 6px;
 }
 
 .btn-sm {
-  padding: 5px 12px;
-  font-size: 0.8rem;
+  padding: 4px 10px;
+  font-size: 0.55rem;
 }
 
 /* 分页 */
@@ -469,16 +475,15 @@ function showToast(message, type = 'success') {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 20px;
-  margin-top: 28px;
+  gap: 16px;
+  margin-top: 24px;
 }
 
 /* 弹窗 */
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.7);
-  backdrop-filter: blur(4px);
+  background: rgba(0, 0, 0, 0.8);
   z-index: 200;
   display: flex;
   align-items: center;
@@ -497,6 +502,82 @@ function showToast(message, type = 'success') {
 .modal-sm {
   max-width: 420px;
 }
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  border-bottom: 3px solid var(--pixel-border);
+}
+
+.modal-header h3 {
+  font-size: 0.8rem;
+  color: var(--color-green);
+}
+
+.close-btn {
+  background: none;
+  border: 2px solid var(--pixel-border);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.6rem;
+  padding: 4px 8px;
+  transition: all 0.1s steps(2);
+}
+
+.close-btn:hover {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+}
+
+.modal-body {
+  padding: 20px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 16px 20px;
+  border-top: 3px solid var(--pixel-border);
+}
+
+.form-row {
+  display: flex;
+  gap: 14px;
+}
+
+.form-row .form-group {
+  flex: 1;
+}
+
+.content-editor {
+  min-height: 240px;
+  font-family: 'Courier New', monospace;
+  font-size: 13px;
+  line-height: 1.8;
+}
+
+@media (max-width: 640px) {
+  .table-header,
+  .table-row {
+    grid-template-columns: 1fr 80px 80px;
+  }
+
+  .col-date {
+    display: none;
+  }
+
+  .form-row {
+    flex-direction: column;
+    gap: 0;
+  }
+}
+</style>
 
 .modal-header {
   display: flex;
