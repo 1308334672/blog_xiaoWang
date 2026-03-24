@@ -40,6 +40,7 @@
           @click="goToPost(post.id)"
         >
           <div class="post-card-header">
+            <span v-if="post.moduleId" class="post-module">{{ getModuleLabel(post.moduleId) }}</span>
             <span class="post-category">{{ post.category }}</span>
             <span class="post-date">{{ formatDate(post.createdAt) }}</span>
           </div>
@@ -81,16 +82,20 @@
 import { onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { usePostsStore } from '../store/posts.js'
+import { useModulesStore } from '../store/modules.js'
 import { storeToRefs } from 'pinia'
 import { formatDate } from '../utils/date.js'
 
 const router = useRouter()
 const postsStore = usePostsStore()
+const modulesStore = useModulesStore()
 const { posts, loading } = storeToRefs(postsStore)
+const { modules } = storeToRefs(modulesStore)
 
 // 加载最新的 6 篇文章
 onMounted(() => {
   postsStore.fetchPosts({ limit: 6 })
+  modulesStore.fetchModules()
 })
 
 // 跳转到文章详情
@@ -98,8 +103,10 @@ function goToPost(id) {
   router.push(`/blog/${id}`)
 }
 
-// 格式化日期
-// formatDate imported from utils
+function getModuleLabel(moduleId) {
+  const m = modules.value.find(m => m.id === moduleId)
+  return m ? `${m.icon} ${m.name}` : ''
+}
 </script>
 
 <style scoped>
@@ -252,6 +259,17 @@ function goToPost(id) {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 14px;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.post-module {
+  font-size: 0.75rem;
+  color: var(--color-gold);
+  background: rgba(241, 196, 15, 0.1);
+  padding: 2px 8px;
+  border-radius: 9999px;
+  border: 1px solid rgba(241, 196, 15, 0.2);
 }
 
 .post-category {

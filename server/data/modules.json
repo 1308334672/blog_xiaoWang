@@ -1,0 +1,38 @@
+[
+  {
+    "id": "module-001",
+    "name": "前端开发",
+    "slug": "frontend",
+    "description": "前端技术相关文章，包括 Vue、React、CSS 等",
+    "icon": "💻",
+    "order": 1,
+    "createdAt": "2025-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "module-002",
+    "name": "后端开发",
+    "slug": "backend",
+    "description": "后端技术相关文章，包括 Node.js、数据库等",
+    "icon": "⚙️",
+    "order": 2,
+    "createdAt": "2025-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "module-003",
+    "name": "学习笔记",
+    "slug": "notes",
+    "description": "学习过程中的记录与总结",
+    "icon": "📝",
+    "order": 3,
+    "createdAt": "2025-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "module-004",
+    "name": "生活随记",
+    "slug": "life",
+    "description": "生活点滴，随想随感",
+    "icon": "🌸",
+    "order": 4,
+    "createdAt": "2025-01-01T00:00:00.000Z"
+  }
+]
