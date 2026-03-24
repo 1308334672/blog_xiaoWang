@@ -5,6 +5,13 @@ node_modules/
 docs/.vitepress/dist/
 docs/.vitepress/cache/
 
+# Vite build output
+client/dist/
+
+# package-lock.json for sub-packages (optional, tracked by root only)
+client/package-lock.json
+server/package-lock.json
+
 # OS files
 .DS_Store
 Thumbs.db

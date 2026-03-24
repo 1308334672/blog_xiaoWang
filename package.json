@@ -1,9 +1,14 @@
 {
   "name": "blog_xiaowang",
   "version": "1.0.0",
-  "description": "小王的学习Blog - 二次元风格",
+  "description": "小王的博客 - Vue 3 全栈项目，新海诚风格",
   "type": "module",
   "scripts": {
+    "dev": "concurrently \"npm run dev:client\" \"npm run dev:server\"",
+    "dev:client": "cd client && npm run dev",
+    "dev:server": "cd server && npm run dev",
+    "install:all": "npm install && cd client && npm install && cd ../server && npm install",
+    "build": "cd client && npm run build",
     "docs:dev": "vitepress dev docs",
     "docs:build": "vitepress build docs",
     "docs:preview": "vitepress preview docs"
@@ -12,7 +17,7 @@
     "type": "git",
     "url": "git+https://github.com/1308334672/blog_xiaoWang.git"
   },
-  "keywords": ["blog", "vitepress", "anime"],
+  "keywords": ["blog", "vue3", "express", "anime", "shinkai"],
   "author": "xiaoWang",
   "license": "ISC",
   "bugs": {
@@ -20,6 +25,7 @@
   },
   "homepage": "https://github.com/1308334672/blog_xiaoWang#readme",
   "devDependencies": {
+    "concurrently": "^8.2.2",
     "vitepress": "^1.6.4"
   }
 }
