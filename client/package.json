@@ -9,9 +9,13 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@bytemd/plugin-gfm": "^1.22.0",
+    "@bytemd/plugin-highlight": "^1.22.0",
+    "@bytemd/vue-next": "^1.22.0",
     "axios": "^1.6.5",
-    "marked": "^11.1.1",
+    "bytemd": "^1.22.0",
     "highlight.js": "^11.9.0",
+    "marked": "^11.1.1",
     "pinia": "^2.1.7",
     "vue": "^3.4.15",
     "vue-router": "^4.2.5"

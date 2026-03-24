@@ -1,0 +1,51 @@
+[
+  {
+    "id": "cat-001",
+    "name": "Vue.js",
+    "slug": "vuejs",
+    "moduleId": "module-001",
+    "createdAt": "2025-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "cat-002",
+    "name": "CSS技巧",
+    "slug": "css-tips",
+    "moduleId": "module-001",
+    "createdAt": "2025-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "cat-003",
+    "name": "JavaScript",
+    "slug": "javascript",
+    "moduleId": "module-001",
+    "createdAt": "2025-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "cat-004",
+    "name": "Node.js",
+    "slug": "nodejs",
+    "moduleId": "module-002",
+    "createdAt": "2025-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "cat-005",
+    "name": "数据库",
+    "slug": "database",
+    "moduleId": "module-002",
+    "createdAt": "2025-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "cat-006",
+    "name": "读书笔记",
+    "slug": "reading",
+    "moduleId": "module-003",
+    "createdAt": "2025-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "cat-007",
+    "name": "日常",
+    "slug": "daily",
+    "moduleId": "module-004",
+    "createdAt": "2025-01-01T00:00:00.000Z"
+  }
+]

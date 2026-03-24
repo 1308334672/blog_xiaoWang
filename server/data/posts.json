@@ -5,6 +5,8 @@
     "summary": "本文介绍如何使用 Vue 3 + Vite + Pinia 搭建一个现代化的前端项目，涵盖组合式 API、响应式系统和路由配置等核心知识点。",
     "content": "# Vue 3 入门指南：从零开始搭建现代前端项目\n\n## 前言\n\nVue 3 是目前最受欢迎的前端框架之一，它带来了组合式 API（Composition API）、更好的 TypeScript 支持和显著的性能提升。本文将带你从零开始搭建一个 Vue 3 项目。\n\n## 环境准备\n\n首先确保你已安装 Node.js（版本 >= 16）：\n\n```bash\nnode -v\nnpm -v\n```\n\n## 创建项目\n\n使用 Vite 创建 Vue 3 项目：\n\n```bash\nnpm create vite@latest my-vue-app -- --template vue\ncd my-vue-app\nnpm install\nnpm run dev\n```\n\n## 组合式 API 示例\n\n```javascript\nimport { ref, computed, onMounted } from 'vue'\n\nexport default {\n  setup() {\n    const count = ref(0)\n    const doubled = computed(() => count.value * 2)\n    \n    const increment = () => {\n      count.value++\n    }\n    \n    onMounted(() => {\n      console.log('组件挂载完成！')\n    })\n    \n    return { count, doubled, increment }\n  }\n}\n```\n\n## Pinia 状态管理\n\nPinia 是 Vue 3 官方推荐的状态管理库，比 Vuex 更加简洁：\n\n```javascript\nimport { defineStore } from 'pinia'\n\nexport const useUserStore = defineStore('user', () => {\n  const name = ref('小王')\n  const isLoggedIn = ref(false)\n  \n  function login(username) {\n    name.value = username\n    isLoggedIn.value = true\n  }\n  \n  return { name, isLoggedIn, login }\n})\n```\n\n## 总结\n\nVue 3 的组合式 API 让代码组织更加灵活，配合 Vite 的快速热更新，开发体验非常流畅。希望本文对你有所帮助！",
     "category": "前端开发",
+    "moduleId": "module-001",
+    "categoryId": "cat-001",
     "tags": ["Vue3", "Vite", "Pinia", "前端"],
     "createdAt": "2025-01-15T08:00:00.000Z",
     "updatedAt": "2025-01-15T08:00:00.000Z"
@@ -15,6 +17,8 @@
     "summary": "学习如何使用 Node.js 和 Express 框架构建一个完整的 RESTful API，包括路由设计、中间件使用和错误处理。",
     "content": "# Node.js + Express 快速构建 RESTful API\n\n## 简介\n\nExpress 是 Node.js 最流行的 Web 框架，轻量且灵活。本文将教你快速构建一个 RESTful API 服务。\n\n## 安装依赖\n\n```bash\nmkdir my-api && cd my-api\nnpm init -y\nnpm install express cors body-parser\n```\n\n## 基础服务器\n\n```javascript\nimport express from 'express'\nimport cors from 'cors'\n\nconst app = express()\nconst PORT = 3000\n\n// 中间件\napp.use(cors())\napp.use(express.json())\n\n// 路由\napp.get('/api/hello', (req, res) => {\n  res.json({ message: '你好，世界！' })\n})\n\napp.listen(PORT, () => {\n  console.log(`服务器运行在 http://localhost:${PORT}`)\n})\n```\n\n## CRUD 路由设计\n\n```javascript\n// 获取所有文章\napp.get('/api/posts', (req, res) => {\n  res.json({ posts: [] })\n})\n\n// 创建文章\napp.post('/api/posts', (req, res) => {\n  const { title, content } = req.body\n  // 保存逻辑...\n  res.status(201).json({ message: '创建成功' })\n})\n\n// 更新文章\napp.put('/api/posts/:id', (req, res) => {\n  const { id } = req.params\n  // 更新逻辑...\n  res.json({ message: '更新成功' })\n})\n\n// 删除文章\napp.delete('/api/posts/:id', (req, res) => {\n  const { id } = req.params\n  // 删除逻辑...\n  res.json({ message: '删除成功' })\n})\n```\n\n## 错误处理中间件\n\n```javascript\n// 全局错误处理\napp.use((err, req, res, next) => {\n  console.error(err.stack)\n  res.status(500).json({ error: '服务器内部错误' })\n})\n```\n\n## 总结\n\nExpress 的简洁设计让 API 开发变得非常高效。结合 JSON 文件存储，无需数据库即可快速搭建原型项目。",
     "category": "后端开发",
+    "moduleId": "module-002",
+    "categoryId": "cat-004",
     "tags": ["Node.js", "Express", "API", "后端"],
     "createdAt": "2025-01-20T10:00:00.000Z",
     "updatedAt": "2025-01-20T10:00:00.000Z"
@@ -25,8 +29,11 @@
     "summary": "探索如何用纯 CSS 和少量 JavaScript 实现新海诚动漫电影中标志性的唯美星空效果，包括渐变天空、闪烁星星和流动光晕。",
     "content": "# CSS 艺术：打造新海诚风格的星空背景\n\n## 灵感来源\n\n新海诚的动漫作品以其唯美的视觉风格著称，特别是那些令人窒息的天空和星空场景。本文将尝试用 CSS 复现这种美丽。\n\n## 渐变天空背景\n\n新海诚风格最标志性的是那种从深蓝到橙紫的渐变色彩：\n\n```css\n.sky-background {\n  background: linear-gradient(\n    to bottom,\n    #0a0a1a 0%,\n    #1a1a3e 20%,\n    #2d1b69 40%,\n    #6b2d8b 60%,\n    #c0392b 80%,\n    #e67e22 100%\n  );\n  min-height: 100vh;\n}\n```\n\n## 星星动画\n\n用伪元素和 CSS 动画创建闪烁的星星效果：\n\n```css\n@keyframes twinkle {\n  0%, 100% { opacity: 0.3; transform: scale(1); }\n  50% { opacity: 1; transform: scale(1.3); }\n}\n\n.star {\n  position: absolute;\n  border-radius: 50%;\n  background: white;\n  animation: twinkle 2s ease-in-out infinite;\n}\n```\n\n## JavaScript 动态生成星星\n\n```javascript\nfunction createStars(count = 200) {\n  const container = document.querySelector('.sky-background')\n  \n  for (let i = 0; i < count; i++) {\n    const star = document.createElement('div')\n    star.classList.add('star')\n    \n    const size = Math.random() * 3 + 1\n    star.style.cssText = `\n      width: ${size}px;\n      height: ${size}px;\n      left: ${Math.random() * 100}%;\n      top: ${Math.random() * 70}%;\n      animation-delay: ${Math.random() * 3}s;\n      animation-duration: ${Math.random() * 2 + 1}s;\n    `\n    \n    container.appendChild(star)\n  }\n}\n\ncreateStars()\n```\n\n## 毛玻璃卡片效果\n\n```css\n.glass-card {\n  background: rgba(255, 255, 255, 0.1);\n  backdrop-filter: blur(10px);\n  -webkit-backdrop-filter: blur(10px);\n  border: 1px solid rgba(255, 255, 255, 0.2);\n  border-radius: 16px;\n  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);\n}\n```\n\n## 总结\n\n通过合理运用 CSS 渐变、动画和 backdrop-filter，我们可以创造出接近新海诚风格的唯美视觉效果。这种技术不仅美观，还完全用 CSS 实现，性能开销很小。",
     "category": "CSS技巧",
+    "moduleId": "module-001",
+    "categoryId": "cat-002",
     "tags": ["CSS", "动画", "新海诚", "视觉设计"],
     "createdAt": "2025-02-01T09:00:00.000Z",
     "updatedAt": "2025-02-01T09:00:00.000Z"
   }
 ]
+

@@ -10,7 +10,7 @@ const router = express.Router()
  */
 router.get('/', (req, res) => {
   try {
-    const { page = 1, limit = 10, search = '', category = '' } = req.query
+    const { page = 1, limit = 10, search = '', category = '', moduleId = '', categoryId = '' } = req.query
     let posts = readPosts()
 
     // 按搜索关键词过滤
@@ -23,9 +23,19 @@ router.get('/', (req, res) => {
       )
     }
 
-    // 按分类过滤
+    // 按分类过滤（兼容旧 category 字段和新 categoryId）
     if (category) {
       posts = posts.filter(p => p.category === category)
+    }
+
+    // 按模块过滤
+    if (moduleId) {
+      posts = posts.filter(p => p.moduleId === moduleId)
+    }
+
+    // 按分类 ID 过滤
+    if (categoryId) {
+      posts = posts.filter(p => p.categoryId === categoryId)
     }
 
     // 按创建时间倒序排列
@@ -76,7 +86,7 @@ router.get('/:id', (req, res) => {
  */
 router.post('/', (req, res) => {
   try {
-    const { title, content, summary = '', category = '未分类', tags = [] } = req.body
+    const { title, content, summary = '', category = '未分类', tags = [], moduleId = '', categoryId = '' } = req.body
 
     if (!title || !content) {
       return res.status(400).json({ error: '标题和内容不能为空' })
@@ -91,6 +101,8 @@ router.post('/', (req, res) => {
       summary: summary || content.substring(0, 100) + '...',
       content,
       category,
+      moduleId,
+      categoryId,
       tags: Array.isArray(tags) ? tags : tags.split(',').map(t => t.trim()),
       createdAt: now,
       updatedAt: now
@@ -118,13 +130,15 @@ router.put('/:id', (req, res) => {
       return res.status(404).json({ error: '文章不存在' })
     }
 
-    const { title, content, summary, category, tags } = req.body
+    const { title, content, summary, category, tags, moduleId, categoryId } = req.body
     const updated = {
       ...posts[index],
       ...(title !== undefined && { title }),
       ...(content !== undefined && { content }),
       ...(summary !== undefined && { summary }),
       ...(category !== undefined && { category }),
+      ...(moduleId !== undefined && { moduleId }),
+      ...(categoryId !== undefined && { categoryId }),
       ...(tags !== undefined && {
         tags: Array.isArray(tags) ? tags : tags.split(',').map(t => t.trim())
       }),

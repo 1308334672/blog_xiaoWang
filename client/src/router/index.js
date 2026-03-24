@@ -4,6 +4,7 @@ import Blog from '../views/Blog.vue'
 import BlogDetail from '../views/BlogDetail.vue'
 import About from '../views/About.vue'
 import Admin from '../views/Admin.vue'
+import AdminEditor from '../views/AdminEditor.vue'
 
 // 路由配置
 const routes = [
@@ -18,6 +19,12 @@ const routes = [
     name: 'Blog',
     component: Blog,
     meta: { title: '博客' }
+  },
+  {
+    path: '/blog/module/:slug',
+    name: 'BlogModule',
+    component: Blog,
+    meta: { title: '模块文章' }
   },
   {
     path: '/blog/:id',
@@ -36,6 +43,18 @@ const routes = [
     name: 'Admin',
     component: Admin,
     meta: { title: '管理后台' }
+  },
+  {
+    path: '/admin/editor',
+    name: 'AdminEditorCreate',
+    component: AdminEditor,
+    meta: { title: '新建文章' }
+  },
+  {
+    path: '/admin/editor/:id',
+    name: 'AdminEditorEdit',
+    component: AdminEditor,
+    meta: { title: '编辑文章' }
   }
 ]
 

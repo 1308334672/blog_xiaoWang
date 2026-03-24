@@ -1,8 +1,8 @@
 import axios from 'axios'
 
-// 创建 axios 实例
+// 创建 axios 实例，baseURL 从环境变量读取，默认 /api（用于本地 Vite proxy）
 const http = axios.create({
-  baseURL: '/api',
+  baseURL: import.meta.env.VITE_API_BASE_URL || '/api',
   timeout: 10000
 })
 
