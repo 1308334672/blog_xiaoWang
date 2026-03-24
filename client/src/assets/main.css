@@ -16,6 +16,7 @@
   --color-green: #00ff41;
   --color-cyan: #00d4ff;
   --color-yellow: #ffd93d;
+  --color-gold: #ffd93d;
   --color-orange: #ff9f43;
   --color-purple: #a855f7;
 
@@ -60,6 +61,14 @@
   margin: 0;
   padding: 0;
   image-rendering: pixelated;
+  cursor: none !important;
+}
+
+/* 移动端恢复默认光标 */
+@media (hover: none) and (pointer: coarse) {
+  *, *::before, *::after {
+    cursor: auto !important;
+  }
 }
 
 html {

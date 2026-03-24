@@ -53,6 +53,12 @@
         <p class="footer-quote">PRESS START TO CONTINUE...</p>
       </div>
     </footer>
+
+    <!-- 自定义像素光标 -->
+    <div class="pixel-cursor" ref="cursorEl"></div>
+    <div class="pixel-cursor-dot"></div>
+    <!-- 点击粒子层 -->
+    <div class="particles-layer" ref="particlesEl"></div>
   </div>
 </template>
 
@@ -62,9 +68,54 @@ import { ref, onMounted, onUnmounted } from 'vue'
 const isScrolled = ref(false)
 const menuOpen = ref(false)
 const pixelCanvas = ref(null)
+const cursorEl = ref(null)
+const particlesEl = ref(null)
 
 function handleScroll() {
   isScrolled.value = window.scrollY > 50
+}
+
+// 像素光标跟踪
+function handleMouseMove(e) {
+  if (!cursorEl.value) return
+  cursorEl.value.style.transform = `translate(${e.clientX - 12}px, ${e.clientY - 12}px)`
+}
+
+// 点击粒子爆炸 + 伤害数字
+function handleClick(e) {
+  createParticles(e.clientX, e.clientY)
+  createDamageNumber(e.clientX, e.clientY)
+}
+
+function createParticles(x, y) {
+  const container = particlesEl.value
+  if (!container) return
+  const colors = ['#00ff41', '#00d4ff', '#ff6b9d', '#ffd93d']
+  for (let i = 0; i < 12; i++) {
+    const p = document.createElement('div')
+    p.className = 'click-particle'
+    const angle = (i / 12) * Math.PI * 2
+    const distance = 28 + Math.random() * 32
+    const dx = Math.cos(angle) * distance
+    const dy = Math.sin(angle) * distance
+    const color = colors[i % colors.length]
+    p.style.cssText = `left:${x - 4}px;top:${y - 4}px;background:${color};box-shadow:0 0 6px ${color};--dx:${dx}px;--dy:${dy}px`
+    container.appendChild(p)
+    setTimeout(() => p.remove(), 550)
+  }
+}
+
+function createDamageNumber(x, y) {
+  const container = particlesEl.value
+  if (!container) return
+  const dmg = Math.floor(Math.random() * 999) + 1
+  const isCrit = dmg > 900
+  const el = document.createElement('div')
+  el.className = isCrit ? 'damage-number crit' : 'damage-number'
+  el.textContent = isCrit ? 'CRITICAL!!' : dmg
+  el.style.cssText = `left:${x}px;top:${y - 10}px`
+  container.appendChild(el)
+  setTimeout(() => el.remove(), 900)
 }
 
 // 像素雨/矩阵雨背景
@@ -134,11 +185,15 @@ let cleanupPixelRain = null
 
 onMounted(() => {
   window.addEventListener('scroll', handleScroll)
+  window.addEventListener('mousemove', handleMouseMove)
+  window.addEventListener('click', handleClick)
   cleanupPixelRain = initPixelRain()
 })
 
 onUnmounted(() => {
   window.removeEventListener('scroll', handleScroll)
+  window.removeEventListener('mousemove', handleMouseMove)
+  window.removeEventListener('click', handleClick)
   if (cleanupPixelRain) cleanupPixelRain()
 })
 </script>
@@ -203,7 +258,7 @@ onUnmounted(() => {
 
 .logo-text {
   font-family: 'Press Start 2P', monospace;
-  font-size: 0.85rem;
+  font-size: 1.05rem;
   color: var(--color-green);
   text-shadow: 0 0 10px rgba(0, 255, 65, 0.5),
                2px 2px 0px #006600;
@@ -215,9 +270,9 @@ onUnmounted(() => {
 }
 
 .nav-link {
-  padding: 6px 12px;
+  padding: 8px 14px;
   color: var(--color-text-secondary);
-  font-size: 0.65rem;
+  font-size: 0.85rem;
   transition: all 0.15s steps(3);
   text-decoration: none;
   font-family: 'Press Start 2P', monospace;
@@ -276,11 +331,11 @@ onUnmounted(() => {
 }
 
 .mobile-menu a {
-  padding: 10px 16px;
+  padding: 12px 16px;
   color: var(--color-text-secondary);
   text-decoration: none;
   font-family: 'Press Start 2P', monospace;
-  font-size: 0.65rem;
+  font-size: 0.85rem;
   transition: all 0.15s steps(3);
   border-bottom: 1px dashed var(--pixel-border);
 }
@@ -345,5 +400,78 @@ onUnmounted(() => {
   .menu-toggle {
     display: flex;
   }
+}
+
+/* ===== 像素光标 ===== */
+.pixel-cursor {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 24px;
+  height: 24px;
+  border: 3px solid var(--color-green);
+  pointer-events: none;
+  z-index: 99999;
+  box-shadow: 0 0 8px var(--color-green), inset 0 0 4px rgba(0,255,65,0.2);
+  transition: border-color 0.1s steps(2);
+}
+
+.pixel-cursor-dot {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 4px;
+  background: var(--color-green);
+  pointer-events: none;
+  z-index: 99999;
+  box-shadow: 0 0 6px var(--color-green);
+  /* dot follows via JS on cursor position + offset */
+}
+
+/* ===== 粒子层 ===== */
+.particles-layer {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 99998;
+  overflow: hidden;
+}
+
+.click-particle {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  pointer-events: none;
+  animation: particle-burst 0.55s steps(6) forwards;
+}
+
+@keyframes particle-burst {
+  0%   { transform: translate(0, 0) scale(1.5); opacity: 1; }
+  100% { transform: translate(var(--dx), var(--dy)) scale(0); opacity: 0; }
+}
+
+.damage-number {
+  position: absolute;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.65rem;
+  color: var(--color-accent);
+  pointer-events: none;
+  text-shadow: 1px 1px 0 #000, 0 0 8px var(--color-accent);
+  animation: damage-float 0.9s steps(9) forwards;
+  white-space: nowrap;
+  transform: translateX(-50%);
+}
+
+.damage-number.crit {
+  color: var(--color-gold);
+  font-size: 0.85rem;
+  text-shadow: 2px 2px 0 #000, 0 0 12px var(--color-gold);
+}
+
+@keyframes damage-float {
+  0%   { transform: translateX(-50%) translateY(0) scale(1.2); opacity: 1; }
+  60%  { transform: translateX(-50%) translateY(-40px) scale(1); opacity: 1; }
+  100% { transform: translateX(-50%) translateY(-70px) scale(0.8); opacity: 0; }
 }
 </style>
