@@ -10,9 +10,13 @@ const DEFAULT_ALLOWED_ORIGINS = [
   'http://localhost:5173',
   'http://127.0.0.1:5173',
   'http://localhost:4173',
-  'http://127.0.0.1:4173',
-  'http://47.103.138.24:5173'
+  'http://127.0.0.1:4173'
 ]
+// 开发服务器 IP：允许该 IP 下的所有端口（Vite 自动漂移端口时同样生效）
+const TRUSTED_HOSTS = (process.env.TRUSTED_HOSTS || 'http://47.103.138.24')
+  .split(',')
+  .map(h => h.trim())
+  .filter(Boolean)
 const allowedOrigins = (process.env.FRONTEND_ORIGIN || '')
   .split(',')
   .map(origin => origin.trim())
@@ -25,11 +29,19 @@ const corsOrigins = allowAllOrigins
 // 中间件配置
 app.use(cors({
   origin(origin, callback) {
-    if (!origin || allowAllOrigins || corsOrigins.includes(origin)) {
+    if (!origin || allowAllOrigins) {
       callback(null, true)
       return
     }
-
+    if (corsOrigins.includes(origin)) {
+      callback(null, true)
+      return
+    }
+    // 允许受信任 IP 的任意端口（适配 Vite 开发端口自动漂移）
+    if (TRUSTED_HOSTS.some(host => origin.startsWith(host + ':'))) {
+      callback(null, true)
+      return
+    }
     callback(new Error(`CORS 不允许的来源: ${origin}`))
   },
   credentials: true
