@@ -577,7 +577,6 @@ function showToast(message, type = 'success') {
     gap: 0;
   }
 }
-</style>
 
 .modal-header {
   display: flex;
