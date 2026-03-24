@@ -5,8 +5,11 @@
   "type": "module",
   "scripts": {
     "dev": "concurrently \"npm run dev:client\" \"npm run dev:server\"",
+    "dev:linux": "concurrently \"npm run dev:client:linux\" \"npm run dev:server:linux\"",
     "dev:client": "cd client && npm run dev",
+    "dev:client:linux": "cd client && VITE_HOST=0.0.0.0 npm run dev",
     "dev:server": "cd server && npm run dev",
+    "dev:server:linux": "cd server && FRONTEND_ORIGIN=http://47.103.138.24:5173 npm run dev",
     "install:all": "npm install && cd client && npm install && cd ../server && npm install",
     "build": "cd client && npm run build",
     "docs:dev": "vitepress dev docs",

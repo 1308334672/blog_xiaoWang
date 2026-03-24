@@ -63,6 +63,46 @@ npm run dev
 - 前端地址：http://localhost:5173
 - 后端地址：http://localhost:3001
 
+### Linux 远程访问开发环境
+
+当前项目已经按你的 Linux 服务器 IP `47.103.138.24` 配置好了远程开发访问。
+
+```bash
+# 进入项目根目录
+cd /path/to/blog_xiaoWang
+
+# 安装依赖
+npm run install:all
+
+# 一条命令同时启动前后端
+npm run dev:linux
+```
+
+启动后可从浏览器访问：
+
+- 前端：http://47.103.138.24:5173
+- 后端健康检查：http://47.103.138.24:3001/api/health
+
+可选环境变量：
+
+- `FRONTEND_ORIGIN`：允许访问后端的前端来源，多个地址用逗号分隔
+- `PORT`：后端端口，默认 `3001`
+- `VITE_HOST`：前端监听地址，默认 `0.0.0.0`
+- `VITE_PORT`：前端端口，默认 `5173`
+- `VITE_API_TARGET`：Vite 代理目标，默认 `http://127.0.0.1:3001`
+
+如果你想分别启动，也可以这样执行：
+
+```bash
+cd /path/to/blog_xiaoWang/server
+FRONTEND_ORIGIN=http://47.103.138.24:5173 npm run dev
+
+cd /path/to/blog_xiaoWang/client
+VITE_HOST=0.0.0.0 npm run dev
+```
+
+如果 Linux 开了防火墙，还需要放行 `5173` 和 `3001` 端口。
+
 ### 3. 单独启动
 
 ```bash
@@ -122,6 +162,12 @@ blog_xiaoWang/
 
 ```bash
 ADMIN_PASSWORD=你的新密码 npm run dev:server
+```
+
+如果前端不是从 `localhost:5173` 访问，而是从服务器 IP 或域名访问，记得同时设置：
+
+```bash
+FRONTEND_ORIGIN=http://47.103.138.24:5173 ADMIN_PASSWORD=你的新密码 npm run dev:server
 ```
 
 ### API 接口

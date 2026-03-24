@@ -6,10 +6,32 @@ import authRouter from './routes/auth.js'
 
 const app = express()
 const PORT = process.env.PORT || 3001
+const DEFAULT_ALLOWED_ORIGINS = [
+  'http://localhost:5173',
+  'http://127.0.0.1:5173',
+  'http://localhost:4173',
+  'http://127.0.0.1:4173',
+  'http://47.103.138.24:5173'
+]
+const allowedOrigins = (process.env.FRONTEND_ORIGIN || '')
+  .split(',')
+  .map(origin => origin.trim())
+  .filter(Boolean)
+const allowAllOrigins = allowedOrigins.includes('*')
+const corsOrigins = allowAllOrigins
+  ? '*'
+  : [...new Set([...DEFAULT_ALLOWED_ORIGINS, ...allowedOrigins])]
 
 // 中间件配置
 app.use(cors({
-  origin: ['http://localhost:5173', 'http://localhost:4173'],
+  origin(origin, callback) {
+    if (!origin || allowAllOrigins || corsOrigins.includes(origin)) {
+      callback(null, true)
+      return
+    }
+
+    callback(new Error(`CORS 不允许的来源: ${origin}`))
+  },
   credentials: true
 }))
 app.use(bodyParser.json())
@@ -32,6 +54,7 @@ app.use((err, req, res, next) => {
 
 app.listen(PORT, () => {
   console.log(`✨ 博客服务器已启动: http://localhost:${PORT}`)
+  console.log(`🌍 已允许的前端来源: ${allowAllOrigins ? '全部' : corsOrigins.join(', ')}`)
 })
 
 export default app
