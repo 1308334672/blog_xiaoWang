@@ -71,20 +71,28 @@ const pixelCanvas = ref(null)
 const cursorEl = ref(null)
 const particlesEl = ref(null)
 
+// 画布鼠标坐标（每帧直接读取，无需响应式）
+let mouseCanvasX = -9999
+let mouseCanvasY = -9999
+const clickRipples = []
+
 function handleScroll() {
   isScrolled.value = window.scrollY > 50
 }
 
-// 像素光标跟踪
+// 像素光标跟踪 + 更新画布鼠标坐标
 function handleMouseMove(e) {
   if (!cursorEl.value) return
   cursorEl.value.style.transform = `translate(${e.clientX - 12}px, ${e.clientY - 12}px)`
+  mouseCanvasX = e.clientX
+  mouseCanvasY = e.clientY
 }
 
-// 点击粒子爆炸 + 伤害数字
+// 点击粒子爆炸 + 伤害数字 + canvas波纹
 function handleClick(e) {
   createParticles(e.clientX, e.clientY)
   createDamageNumber(e.clientX, e.clientY)
+  clickRipples.push({ x: e.clientX, y: e.clientY, r: 0, maxR: 260, alpha: 0.9 })
 }
 
 function createParticles(x, y) {
@@ -149,16 +157,32 @@ function initPixelRain() {
       const x = i * fontSize
       const y = drops[i] * fontSize
 
-      // 随机绿色/青色/暗色
-      const brightness = Math.random()
-      if (brightness > 0.95) {
+      // 鼠标近距离影响：越近越亮越快
+      const dist = Math.hypot(mouseCanvasX - x, mouseCanvasY - y)
+      const influence = Math.max(0, 1 - dist / 200)
+      let speed = 0.4
+
+      if (influence > 0.6) {
         ctx.fillStyle = '#ffffff'
-      } else if (brightness > 0.8) {
-        ctx.fillStyle = 'rgba(0, 255, 65, 0.9)'
-      } else if (brightness > 0.6) {
-        ctx.fillStyle = 'rgba(0, 212, 255, 0.4)'
+        speed = 2.0
+      } else if (influence > 0.3) {
+        ctx.fillStyle = `rgba(0, 212, 255, ${0.65 + influence * 0.35})`
+        speed = 1.1
+      } else if (influence > 0) {
+        ctx.fillStyle = `rgba(0, 255, 65, ${0.4 + influence * 2})`
+        speed = 0.7
       } else {
-        ctx.fillStyle = 'rgba(0, 255, 65, 0.15)'
+        // 正常随机颜色
+        const brightness = Math.random()
+        if (brightness > 0.95) {
+          ctx.fillStyle = '#ffffff'
+        } else if (brightness > 0.8) {
+          ctx.fillStyle = 'rgba(0, 255, 65, 0.9)'
+        } else if (brightness > 0.6) {
+          ctx.fillStyle = 'rgba(0, 212, 255, 0.4)'
+        } else {
+          ctx.fillStyle = 'rgba(0, 255, 65, 0.15)'
+        }
       }
 
       ctx.fillText(char, x, y)
@@ -167,7 +191,31 @@ function initPixelRain() {
         drops[i] = 0
       }
 
-      drops[i] += 0.4
+      drops[i] += speed
+    }
+
+    // 绘制点击冲击波
+    for (let j = clickRipples.length - 1; j >= 0; j--) {
+      const rp = clickRipples[j]
+      rp.r += 5
+      rp.alpha = (1 - rp.r / rp.maxR) * 0.85
+      if (rp.r >= rp.maxR) { clickRipples.splice(j, 1); continue }
+
+      // 外圈 — 青色
+      ctx.lineWidth = 2
+      ctx.strokeStyle = `rgba(0, 212, 255, ${rp.alpha})`
+      ctx.beginPath()
+      ctx.arc(rp.x, rp.y, rp.r, 0, Math.PI * 2)
+      ctx.stroke()
+
+      // 内圈 — 粉色
+      if (rp.r > 30) {
+        ctx.lineWidth = 1
+        ctx.strokeStyle = `rgba(255, 107, 157, ${rp.alpha * 0.55})`
+        ctx.beginPath()
+        ctx.arc(rp.x, rp.y, rp.r * 0.55, 0, Math.PI * 2)
+        ctx.stroke()
+      }
     }
 
     animId = requestAnimationFrame(draw)
