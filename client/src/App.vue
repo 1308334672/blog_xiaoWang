@@ -15,6 +15,7 @@
           <router-link to="/" class="nav-link" active-class="active" exact>[ 首页 ]</router-link>
           <router-link to="/blog" class="nav-link" active-class="active">[ 博客 ]</router-link>
           <router-link to="/about" class="nav-link" active-class="active">[ 关于 ]</router-link>
+          <router-link to="/game" class="nav-link nav-link-game" active-class="active">[ 🎯游戏 ]</router-link>
           <router-link to="/admin" class="nav-link nav-link-admin" active-class="active">[ 管理 ]</router-link>
         </div>
 
@@ -29,6 +30,7 @@
         <router-link to="/" @click="menuOpen = false">[ 首页 ]</router-link>
         <router-link to="/blog" @click="menuOpen = false">[ 博客 ]</router-link>
         <router-link to="/about" @click="menuOpen = false">[ 关于 ]</router-link>
+        <router-link to="/game" @click="menuOpen = false">[ 🎯游戏 ]</router-link>
         <router-link to="/admin" @click="menuOpen = false">[ 管理 ]</router-link>
       </div>
     </nav>
@@ -333,6 +335,18 @@ onUnmounted(() => {
   text-shadow: 0 0 8px rgba(0, 255, 65, 0.5);
   border-color: var(--color-green);
   background: rgba(0, 255, 65, 0.08);
+}
+
+.nav-link-game {
+  color: var(--color-yellow);
+}
+
+.nav-link-game:hover,
+.nav-link-game.active {
+  color: var(--color-yellow);
+  text-shadow: 0 0 8px rgba(255,217,61,0.6);
+  border-color: var(--color-yellow);
+  background: rgba(255,217,61,0.08);
 }
 
 .nav-link-admin {

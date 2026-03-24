@@ -4,6 +4,7 @@ import Blog from '../views/Blog.vue'
 import BlogDetail from '../views/BlogDetail.vue'
 import About from '../views/About.vue'
 import Admin from '../views/Admin.vue'
+import Game from '../views/Game.vue'
 
 // 路由配置
 const routes = [
@@ -36,6 +37,12 @@ const routes = [
     name: 'Admin',
     component: Admin,
     meta: { title: '管理后台' }
+  },
+  {
+    path: '/game',
+    name: 'Game',
+    component: Game,
+    meta: { title: 'AIM TRAINER' }
   }
 ]
 
