@@ -27,7 +27,7 @@
     <!-- ══════════ 管理后台 ══════════ -->
     <div v-else>
 
-      <!-- ─── 写作室（全屏覆盖）─── -->
+      <!-- ─── 写作室 ─── -->
       <div v-if="mode === 'writing'" class="writing-room">
         <!-- 顶部工具栏 -->
         <div class="wr-topbar">
@@ -37,9 +37,24 @@
             class="wr-title-input"
             placeholder="文章标题..."
           />
-          <select v-model="form.category" class="wr-select">
-            <option v-for="c in allCategories" :key="c" :value="c">{{ c }}</option>
-          </select>
+          <div class="wr-cat-group">
+            <select v-model="form.category" class="wr-select">
+              <option v-for="c in allCategories" :key="c" :value="c">{{ c }}</option>
+            </select>
+            <button class="wr-add-col-btn" @click="showQuickAdd = !showQuickAdd" title="新建栏目">+</button>
+            <!-- 快捷新建栏目弹出 -->
+            <div v-if="showQuickAdd" class="quick-add-popover">
+              <input
+                v-model="quickColName"
+                class="quick-add-input"
+                placeholder="栏目名称..."
+                @keyup.enter="quickAddColumn"
+                ref="quickAddInput"
+              />
+              <button class="btn btn-primary btn-sm" @click="quickAddColumn" :disabled="!quickColName.trim()">OK</button>
+              <button class="btn btn-outline btn-sm" @click="showQuickAdd = false">X</button>
+            </div>
+          </div>
           <button
             class="btn btn-primary wr-save-btn"
             :disabled="submitting"
@@ -189,7 +204,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted, nextTick, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '../store/auth.js'
 import { usePostsStore } from '../store/posts.js'
@@ -229,6 +244,15 @@ const newColumnName = ref('')
 const deleteTarget = ref(null)
 const toast = ref({ show: false, message: '', type: 'success' })
 
+// ─── 快捷新建栏目 ─────────────────────────────────────────
+const showQuickAdd = ref(false)
+const quickColName = ref('')
+const quickAddInput = ref(null)
+
+watch(showQuickAdd, (v) => {
+  if (v) nextTick(() => quickAddInput.value?.focus())
+})
+
 // ═══════════════════════════════════════════════
 //  初始化
 // ═══════════════════════════════════════════════
@@ -239,9 +263,7 @@ onMounted(async () => {
   }
 })
 
-onUnmounted(() => {
-  document.body.style.overflow = ''
-})
+onUnmounted(() => {})
 
 // ─── 加载文章 ─────────────────────────────────────────────
 function loadPosts() {
@@ -315,8 +337,9 @@ function openCreate() {
   editingId.value = null
   form.value = { title: '', content: '', summary: '', category: allCategories.value[0] || '未分类', tags: '' }
   formError.value = ''
+  showQuickAdd.value = false
+  quickColName.value = ''
   mode.value = 'writing'
-  document.body.style.overflow = 'hidden'
 }
 
 async function openEdit(id) {
@@ -331,8 +354,9 @@ async function openEdit(id) {
       tags: Array.isArray(post.tags) ? post.tags.join(', ') : (post.tags || '')
     }
     formError.value = ''
+    showQuickAdd.value = false
+    quickColName.value = ''
     mode.value = 'writing'
-    document.body.style.overflow = 'hidden'
   } catch {
     showToast('获取文章失败', 'error')
   }
@@ -340,7 +364,6 @@ async function openEdit(id) {
 
 function exitWriting() {
   mode.value = 'list'
-  document.body.style.overflow = ''
 }
 
 async function handleSubmit() {
@@ -357,7 +380,6 @@ async function handleSubmit() {
       showToast('文章发布成功 🎉')
     }
     mode.value = 'list'
-    document.body.style.overflow = ''
     loadPosts()
   } catch (err) {
     formError.value = err.message || '操作失败，请重试'
@@ -385,8 +407,23 @@ async function handleLogin() {
 }
 
 function handleLogout() {
-  document.body.style.overflow = ''
   authStore.logout()
+}
+
+// ─── 快捷新建栏目 ─────────────────────────────────────────
+async function quickAddColumn() {
+  const name = quickColName.value.trim()
+  if (!name) return
+  try {
+    await categoriesApi.add(name)
+    await loadCategories()
+    form.value.category = name
+    quickColName.value = ''
+    showQuickAdd.value = false
+    showToast(`栏目「${name}」已创建 ✨`)
+  } catch (err) {
+    showToast(err.response?.data?.error || '创建栏目失败', 'error')
+  }
 }
 
 // ─── 删除文章 ─────────────────────────────────────────────
@@ -647,13 +684,14 @@ function showToast(message, type = 'success') {
 ═══════════════════════════════════════ */
 .writing-room {
   position: fixed;
-  inset: 0;
-  z-index: 300;
-  background: var(--color-bg-deep);
+  top: 70px;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 200;
   display: flex;
   flex-direction: column;
-  width: 100vw;
-  height: 100dvh;
+  background: var(--color-bg-deep);
 }
 
 /* 顶部工具栏 */
@@ -699,6 +737,13 @@ function showToast(message, type = 'success') {
 .wr-title-input::placeholder { color: var(--color-text-muted); }
 .wr-title-input:focus { border-bottom-color: var(--color-green); }
 
+.wr-cat-group {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
 .wr-select {
   background: rgba(0,20,10,0.8);
   border: 2px solid var(--pixel-border);
@@ -707,10 +752,55 @@ function showToast(message, type = 'success') {
   font-size: 0.55rem;
   padding: 8px 10px;
   cursor: none;
-  flex-shrink: 0;
   max-width: 160px;
 }
 .wr-select:focus { outline: none; border-color: var(--color-green); }
+.wr-add-col-btn {
+  background: transparent;
+  border: 2px solid var(--color-cyan);
+  color: var(--color-cyan);
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.7rem;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: none;
+  transition: all 0.1s steps(2);
+  flex-shrink: 0;
+}
+.wr-add-col-btn:hover {
+  background: rgba(0,212,255,0.12);
+  border-color: var(--color-green);
+  color: var(--color-green);
+}
+.quick-add-popover {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 6px;
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  background: var(--color-bg-deep);
+  border: 2px solid var(--color-cyan);
+  padding: 8px 10px;
+  z-index: 100;
+  white-space: nowrap;
+}
+.quick-add-input {
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid var(--pixel-border);
+  color: var(--color-text-primary);
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.5rem;
+  padding: 4px 8px;
+  outline: none;
+  width: 140px;
+}
+.quick-add-input:focus { border-bottom-color: var(--color-cyan); }
 
 .wr-save-btn { flex-shrink: 0; }
 
