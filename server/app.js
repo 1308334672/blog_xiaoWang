@@ -38,8 +38,8 @@ app.use(cors({
       callback(null, true)
       return
     }
-    // 允许受信任 IP 的任意端口（适配 Vite 开发端口自动漂移）
-    if (TRUSTED_HOSTS.some(host => origin.startsWith(host + ':'))) {
+    // 允许受信任 IP（含标准端口80/443直接访问，及任意非标准端口）
+    if (TRUSTED_HOSTS.some(host => origin === host || origin.startsWith(host + ':'))) {
       callback(null, true)
       return
     }
