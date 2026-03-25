@@ -38,7 +38,7 @@
         </div>
         <div class="col-stats">
           <div class="stat-num">{{ col.count }}</div>
-          <div class="stat-label">POSTS</div>
+          <div class="stat-label">{{ col.count ? 'POSTS' : 'EMPTY' }}</div>
         </div>
         <div class="col-arrow">&gt;&gt;</div>
       </div>
@@ -197,7 +197,7 @@ onMounted(async () => {
 .col-stats {
   text-align: center;
   flex-shrink: 0;
-  min-width: 48px;
+  min-width: 72px;
   border: 2px solid var(--pixel-border);
   padding: 6px 10px;
 }
@@ -211,6 +211,7 @@ onMounted(async () => {
 .stat-label {
   font-size: 0.4rem;
   color: var(--color-text-muted);
+  line-height: 1.4;
 }
 
 .col-arrow {

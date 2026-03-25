@@ -1,8 +1,24 @@
 import express from 'express'
+import { readFileSync, existsSync } from 'fs'
+import { dirname, join } from 'path'
+import { fileURLToPath } from 'url'
 import { v4 as uuidv4 } from 'uuid'
 import { readPosts, writePosts } from '../models/postModel.js'
 
 const router = express.Router()
+const __dirname = dirname(fileURLToPath(import.meta.url))
+const CATEGORIES_FILE = join(__dirname, '../data/categories.json')
+const DEFAULT_CATEGORIES = ['前端开发', '后端开发', 'CSS技巧', '学习笔记', '生活随记', '未分类']
+
+function readCategoryNames() {
+  try {
+    if (!existsSync(CATEGORIES_FILE)) return [...DEFAULT_CATEGORIES]
+    const categories = JSON.parse(readFileSync(CATEGORIES_FILE, 'utf-8'))
+    return Array.isArray(categories) ? categories : [...DEFAULT_CATEGORIES]
+  } catch {
+    return [...DEFAULT_CATEGORIES]
+  }
+}
 
 /**
  * GET /api/posts
@@ -60,17 +76,28 @@ router.get('/', (req, res) => {
 router.get('/categories', (req, res) => {
   try {
     const posts = readPosts()
+    const categoryNames = readCategoryNames()
     const catMap = {}
+
+    categoryNames.forEach(name => {
+      catMap[name] = { name, count: 0, latestAt: null, latestTitle: '' }
+    })
+
     posts.forEach(post => {
       const cat = post.category || '未分类'
-      if (!catMap[cat]) catMap[cat] = { name: cat, count: 0, latestAt: null }
+      if (!catMap[cat]) catMap[cat] = { name: cat, count: 0, latestAt: null, latestTitle: '' }
       catMap[cat].count++
       if (!catMap[cat].latestAt || new Date(post.createdAt) > new Date(catMap[cat].latestAt)) {
         catMap[cat].latestAt = post.createdAt
         catMap[cat].latestTitle = post.title
       }
     })
-    res.json(Object.values(catMap).sort((a, b) => b.count - a.count))
+    res.json(
+      Object.values(catMap).sort((a, b) => {
+        if (b.count !== a.count) return b.count - a.count
+        return a.name.localeCompare(b.name, 'zh-CN')
+      })
+    )
   } catch (err) {
     res.status(500).json({ error: '获取分类失败', message: err.message })
   }

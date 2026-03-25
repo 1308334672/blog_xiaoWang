@@ -96,7 +96,7 @@ const props = defineProps({
 const emit = defineEmits(['update:modelValue'])
 
 const textareaEl = ref(null)
-const viewMode = ref('split')   // 'edit' | 'split' | 'preview'
+const viewMode = ref('edit')   // 'edit' | 'split' | 'preview'
 const isFullscreen = ref(false)
 
 // marked 配置（与 BlogDetail 保持一致）
@@ -225,7 +225,7 @@ function insertHRule() {
   border: 2px solid var(--pixel-border);
   background: var(--color-bg-deep);
   font-family: 'Press Start 2P', monospace;
-  min-height: 500px;
+  min-height: 100%;
 }
 
 /* 全屏 */
@@ -233,7 +233,7 @@ function insertHRule() {
   position: fixed;
   inset: 0;
   z-index: 9000;
-  min-height: 100vh;
+  min-height: 100dvh;
   border: none;
 }
 
@@ -344,9 +344,9 @@ function insertHRule() {
   outline: none;
   color: var(--color-text-primary);
   font-family: 'Courier New', Courier, monospace;
-  font-size: 0.82rem;
-  line-height: 1.7;
-  padding: 16px;
+  font-size: 1rem;
+  line-height: 1.9;
+  padding: 24px 28px;
   overflow-y: auto;
   tab-size: 2;
 }
@@ -360,9 +360,9 @@ function insertHRule() {
 .md-preview {
   flex: 1;
   overflow-y: auto;
-  padding: 16px 20px;
+  padding: 24px 28px;
   font-family: 'Courier New', Courier, monospace;
-  font-size: 0.82rem;
+  font-size: 1rem;
   line-height: 1.8;
   color: var(--color-text-primary);
 }

@@ -1,5 +1,5 @@
 <template>
-  <div class="admin-page container">
+  <div class="admin-page">
     <!-- ══════════ 登录面板 ══════════ -->
     <div v-if="!isLoggedIn" class="login-panel">
       <div class="login-card glass-card">
@@ -189,7 +189,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '../store/auth.js'
 import { usePostsStore } from '../store/posts.js'
@@ -239,6 +239,10 @@ onMounted(async () => {
   }
 })
 
+onUnmounted(() => {
+  document.body.style.overflow = ''
+})
+
 // ─── 加载文章 ─────────────────────────────────────────────
 function loadPosts() {
   postsStore.fetchPosts({ page: 1, limit: 20 })
@@ -277,24 +281,30 @@ function switchToColumns() {
 async function addColumn() {
   const name = newColumnName.value.trim()
   if (!name) return
+  columnsLoading.value = true
   try {
     await categoriesApi.add(name)
     newColumnName.value = ''
     showToast(`专栏「${name}」已创建 ✨`)
-    loadColumnStats()
+    await loadColumnStats()
   } catch (err) {
     showToast(err.response?.data?.error || '创建失败', 'error')
+  } finally {
+    columnsLoading.value = false
   }
 }
 
 async function deleteColumn(name) {
   if (!confirm(`确定删除专栏「${name}」？`)) return
+  columnsLoading.value = true
   try {
     await categoriesApi.remove(name)
     showToast(`专栏「${name}」已删除`)
-    loadColumnStats()
+    await loadColumnStats()
   } catch (err) {
     showToast(err.response?.data?.error || '删除失败', 'error')
+  } finally {
+    columnsLoading.value = false
   }
 }
 
@@ -306,6 +316,7 @@ function openCreate() {
   form.value = { title: '', content: '', summary: '', category: allCategories.value[0] || '未分类', tags: '' }
   formError.value = ''
   mode.value = 'writing'
+  document.body.style.overflow = 'hidden'
 }
 
 async function openEdit(id) {
@@ -321,6 +332,7 @@ async function openEdit(id) {
     }
     formError.value = ''
     mode.value = 'writing'
+    document.body.style.overflow = 'hidden'
   } catch {
     showToast('获取文章失败', 'error')
   }
@@ -328,6 +340,7 @@ async function openEdit(id) {
 
 function exitWriting() {
   mode.value = 'list'
+  document.body.style.overflow = ''
 }
 
 async function handleSubmit() {
@@ -344,6 +357,7 @@ async function handleSubmit() {
       showToast('文章发布成功 🎉')
     }
     mode.value = 'list'
+    document.body.style.overflow = ''
     loadPosts()
   } catch (err) {
     formError.value = err.message || '操作失败，请重试'
@@ -371,6 +385,7 @@ async function handleLogin() {
 }
 
 function handleLogout() {
+  document.body.style.overflow = ''
   authStore.logout()
 }
 
@@ -403,6 +418,8 @@ function showToast(message, type = 'success') {
 <style scoped>
 /* ─── 页面基础 ─────────────────────────────────── */
 .admin-page {
+  width: 100%;
+  max-width: none;
   padding: 40px 24px 80px;
   min-height: 80vh;
 }
@@ -635,6 +652,8 @@ function showToast(message, type = 'success') {
   background: var(--color-bg-deep);
   display: flex;
   flex-direction: column;
+  width: 100vw;
+  height: 100dvh;
 }
 
 /* 顶部工具栏 */
@@ -732,6 +751,7 @@ function showToast(message, type = 'success') {
   min-height: 0;
   display: flex;
   flex-direction: column;
+  padding: 0;
 }
 .wr-editor :deep(.md-editor) {
   flex: 1;
