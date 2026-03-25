@@ -54,6 +54,29 @@ router.get('/', (req, res) => {
 })
 
 /**
+ * GET /api/posts/categories
+ * 获取所有分类及文章数量（必须在 /:id 之前注册）
+ */
+router.get('/categories', (req, res) => {
+  try {
+    const posts = readPosts()
+    const catMap = {}
+    posts.forEach(post => {
+      const cat = post.category || '未分类'
+      if (!catMap[cat]) catMap[cat] = { name: cat, count: 0, latestAt: null }
+      catMap[cat].count++
+      if (!catMap[cat].latestAt || new Date(post.createdAt) > new Date(catMap[cat].latestAt)) {
+        catMap[cat].latestAt = post.createdAt
+        catMap[cat].latestTitle = post.title
+      }
+    })
+    res.json(Object.values(catMap).sort((a, b) => b.count - a.count))
+  } catch (err) {
+    res.status(500).json({ error: '获取分类失败', message: err.message })
+  }
+})
+
+/**
  * GET /api/posts/:id
  * 获取单篇文章详情
  */

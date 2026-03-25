@@ -105,7 +105,7 @@
           </div>
           <div class="form-group">
             <label>CONTENT (Markdown) *</label>
-            <textarea v-model="form.content" class="input-field content-editor" placeholder="Write in Markdown..."></textarea>
+            <MarkdownEditor v-model="form.content" />
           </div>
           <div v-if="formError" class="error-msg">{{ formError }}</div>
         </div>
@@ -148,6 +148,7 @@ import { usePostsStore } from '../store/posts.js'
 import { storeToRefs } from 'pinia'
 import { postsApi } from '../api/posts.js'
 import { formatDate } from '../utils/date.js'
+import MarkdownEditor from '../components/MarkdownEditor.vue'
 
 const authStore = useAuthStore()
 const postsStore = usePostsStore()

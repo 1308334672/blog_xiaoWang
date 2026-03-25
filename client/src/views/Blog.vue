@@ -2,7 +2,8 @@
   <div class="blog-page container">
     <!-- 页面标题 -->
     <div class="page-header">
-      <h1 class="page-title">&gt; BLOG_ARCHIVE</h1>
+      <button v-if="columnMode" class="back-btn" @click="router.push('/blog')">&lt;&lt; BACK TO COLUMNS</button>
+      <h1 class="page-title">&gt; {{ columnMode ? columnName : 'BLOG_ARCHIVE' }}</h1>
       <p class="page-desc">// 探索技术与思考的边界</p>
     </div>
 
@@ -15,7 +16,7 @@
         placeholder="> SEARCH..."
         @input="handleSearch"
       />
-      <select v-model="selectedCategory" class="input-field category-select" @change="handleSearch">
+      <select v-if="!columnMode" v-model="selectedCategory" class="input-field category-select" @change="handleSearch">
         <option value="">ALL</option>
         <option v-for="cat in categories" :key="cat" :value="cat">{{ cat }}</option>
       </select>
@@ -78,13 +79,14 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref, computed, onMounted } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import { usePostsStore } from '../store/posts.js'
 import { storeToRefs } from 'pinia'
 import { formatDate } from '../utils/date.js'
 
 const router = useRouter()
+const route = useRoute()
 const postsStore = usePostsStore()
 const { posts, loading, total, totalPages, currentPage } = storeToRefs(postsStore)
 
@@ -92,11 +94,23 @@ const searchQuery = ref('')
 const selectedCategory = ref('')
 const categories = ref(['前端开发', '后端开发', 'CSS技巧', '学习笔记', '生活随记'])
 
+// 专栏模式：从路由读取 category 参数
+const columnMode = computed(() => {
+  const cat = route.params.category
+  return cat && cat !== 'ALL'
+})
+const columnName = computed(() => route.params.category || '')
+
 let searchTimer = null
 
 // 初始化加载
 onMounted(() => {
-  postsStore.fetchPosts({ page: 1, limit: 8 })
+  const cat = route.params.category
+  const initCategory = cat && cat !== 'ALL' ? cat : ''
+  const initSearch = route.query.search || ''
+  selectedCategory.value = initCategory
+  searchQuery.value = initSearch
+  postsStore.fetchPosts({ page: 1, limit: 8, category: initCategory, search: initSearch })
 })
 
 // 防抖搜索
@@ -142,6 +156,22 @@ function goToPage(page) {
 .page-header {
   text-align: center;
   margin-bottom: 40px;
+}
+
+.back-btn {
+  background: transparent;
+  border: 2px solid var(--color-cyan);
+  color: var(--color-cyan);
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.55rem;
+  padding: 8px 14px;
+  cursor: none;
+  margin-bottom: 14px;
+  transition: all 0.1s steps(2);
+}
+.back-btn:hover {
+  background: rgba(0,212,255,0.1);
+  box-shadow: 3px 3px 0 var(--color-cyan);
 }
 
 .page-title {

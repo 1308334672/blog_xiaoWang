@@ -56,9 +56,13 @@
       </div>
     </footer>
 
-    <!-- 自定义像素光标 -->
-    <div class="pixel-cursor" ref="cursorEl"></div>
-    <div class="pixel-cursor-dot"></div>
+    <!-- 自定义准星光标 -->
+    <div class="cursor-crosshair" ref="cursorEl">
+      <span class="ch-line ch-top"></span>
+      <span class="ch-line ch-right"></span>
+      <span class="ch-line ch-bottom"></span>
+      <span class="ch-line ch-left"></span>
+    </div>
     <!-- 点击粒子层 -->
     <div class="particles-layer" ref="particlesEl"></div>
   </div>
@@ -84,8 +88,10 @@ function handleScroll() {
 
 // 像素光标跟踪 + 更新画布鼠标坐标
 function handleMouseMove(e) {
-  if (!cursorEl.value) return
-  cursorEl.value.style.transform = `translate(${e.clientX - 12}px, ${e.clientY - 12}px)`
+  if (cursorEl.value) {
+    cursorEl.value.style.left = e.clientX + 'px'
+    cursorEl.value.style.top  = e.clientY + 'px'
+  }
   mouseCanvasX = e.clientX
   mouseCanvasY = e.clientY
 }
@@ -464,32 +470,51 @@ onUnmounted(() => {
   }
 }
 
-/* ===== 像素光标 ===== */
-.pixel-cursor {
+/* ===== 准星光标 ===== */
+.cursor-crosshair {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 24px;
-  height: 24px;
-  border: 3px solid var(--color-green);
+  width: 0;
+  height: 0;
   pointer-events: none;
   z-index: 99999;
-  box-shadow: 0 0 8px var(--color-green), inset 0 0 4px rgba(0,255,65,0.2);
-  transition: border-color 0.1s steps(2);
+  transform: translate(-50%, -50%);
 }
 
-.pixel-cursor-dot {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 4px;
-  height: 4px;
-  background: var(--color-green);
-  pointer-events: none;
-  z-index: 99999;
-  box-shadow: 0 0 6px var(--color-green);
-  /* dot follows via JS on cursor position + offset */
+/* 外圆 */
+.cursor-crosshair::before {
+  content: '';
+  position: absolute;
+  width: 36px;
+  height: 36px;
+  border: 1px solid rgba(0, 255, 65, 0.35);
+  border-radius: 50%;
+  top: -18px;
+  left: -18px;
+  box-shadow: 0 0 8px rgba(0,255,65,0.15);
 }
+
+/* 准星线 */
+.ch-line {
+  position: absolute;
+  background: var(--color-green);
+  box-shadow: 0 0 5px var(--color-green);
+}
+
+.ch-line.ch-top, .ch-line.ch-bottom {
+  width: 2px;
+  height: 11px;
+  left: -1px;
+}
+.ch-line.ch-top    { bottom: 4px; }
+.ch-line.ch-bottom { top: 4px; }
+
+.ch-line.ch-left, .ch-line.ch-right {
+  height: 2px;
+  width: 11px;
+  top: -1px;
+}
+.ch-line.ch-left  { right: 4px; }
+.ch-line.ch-right { left: 4px; }
 
 /* ===== 粒子层 ===== */
 .particles-layer {

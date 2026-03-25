@@ -13,6 +13,11 @@ export const postsApi = {
     return http.get('/posts', { params }).then(r => r.data)
   },
 
+  // 获取所有分类及文章数
+  getCategories() {
+    return http.get('/posts/categories').then(r => r.data)
+  },
+
   // 获取单篇文章
   getById(id) {
     return http.get(`/posts/${id}`).then(r => r.data)

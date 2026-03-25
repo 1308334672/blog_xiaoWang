@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import Home from '../views/Home.vue'
+import BlogColumns from '../views/BlogColumns.vue'
 import Blog from '../views/Blog.vue'
 import BlogDetail from '../views/BlogDetail.vue'
 import About from '../views/About.vue'
@@ -16,6 +17,12 @@ const routes = [
   },
   {
     path: '/blog',
+    name: 'BlogColumns',
+    component: BlogColumns,
+    meta: { title: '专栏' }
+  },
+  {
+    path: '/blog/column/:category',
     name: 'Blog',
     component: Blog,
     meta: { title: '博客' }
