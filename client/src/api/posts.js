@@ -51,3 +51,14 @@ export const categoriesApi = {
     return http.delete(`/categories/${encodeURIComponent(name)}`).then(r => r.data)
   }
 }
+
+// 图片上传 API
+export const uploadApi = {
+  image(file) {
+    const form = new FormData()
+    form.append('image', file)
+    return http.post('/upload', form, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    }).then(r => r.data)
+  }
+}

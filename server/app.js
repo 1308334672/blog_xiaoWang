@@ -1,9 +1,17 @@
+import 'dotenv/config'
 import express from 'express'
 import cors from 'cors'
 import bodyParser from 'body-parser'
+import { fileURLToPath } from 'url'
+import { dirname, join } from 'path'
 import postsRouter from './routes/posts.js'
 import authRouter from './routes/auth.js'
 import categoriesRouter from './routes/categories.js'
+import uploadRouter from './routes/upload.js'
+import { initDB } from './db/index.js'
+
+const __filename = fileURLToPath(import.meta.url)
+const __dirname  = dirname(__filename)
 
 const app = express()
 const PORT = process.env.PORT || 3001
@@ -50,10 +58,14 @@ app.use(cors({
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: true }))
 
+// 静态文件：上传的图片通过 /uploads/* 直接访问
+app.use('/uploads', express.static(join(__dirname, 'public/uploads')))
+
 // API 路由
 app.use('/api/posts', postsRouter)
 app.use('/api/auth', authRouter)
 app.use('/api/categories', categoriesRouter)
+app.use('/api/upload', uploadRouter)
 
 // 健康检查
 app.get('/api/health', (req, res) => {
@@ -66,9 +78,14 @@ app.use((err, req, res, next) => {
   res.status(500).json({ error: '服务器内部错误', message: err.message })
 })
 
-app.listen(PORT, () => {
-  console.log(`✨ 博客服务器已启动: http://localhost:${PORT}`)
-  console.log(`🌍 已允许的前端来源: ${allowAllOrigins ? '全部' : corsOrigins.join(', ')}`)
-})
+initDB()
+  .then(() => app.listen(PORT, () => {
+    console.log(`✨ 博客服务器已启动: http://localhost:${PORT}`)
+    console.log(`🌍 已允许的前端来源: ${allowAllOrigins ? '全部' : corsOrigins.join(', ')}`)
+  }))
+  .catch(err => {
+    console.error('❌ 数据库初始化失败，服务退出:', err.message)
+    process.exit(1)
+  })
 
 export default app

@@ -1,51 +1,45 @@
 import express from 'express'
-import { readFileSync, writeFileSync, existsSync } from 'fs'
-import { fileURLToPath } from 'url'
-import { dirname, join } from 'path'
+import pool from '../db/index.js'
 
 const router = express.Router()
-const __dirname = dirname(fileURLToPath(import.meta.url))
-const DATA_FILE = join(__dirname, '../data/categories.json')
-const DEFAULT = ['前端开发', '后端开发', 'CSS技巧', '学习笔记', '生活随记', '未分类']
 
-function readCategories() {
+/** GET /api/categories — 获取所有专栏名称列表 */
+router.get('/', async (req, res) => {
   try {
-    if (!existsSync(DATA_FILE)) return [...DEFAULT]
-    return JSON.parse(readFileSync(DATA_FILE, 'utf-8'))
-  } catch {
-    return [...DEFAULT]
+    const [rows] = await pool.query('SELECT name FROM categories ORDER BY id ASC')
+    res.json(rows.map(r => r.name))
+  } catch (err) {
+    res.status(500).json({ error: '获取分类失败', message: err.message })
   }
-}
-
-function writeCategories(cats) {
-  writeFileSync(DATA_FILE, JSON.stringify(cats, null, 2), 'utf-8')
-}
-
-/** GET /api/categories — 获取所有专栏 */
-router.get('/', (req, res) => {
-  res.json(readCategories())
 })
 
 /** POST /api/categories — 新建专栏 */
-router.post('/', (req, res) => {
+router.post('/', async (req, res) => {
   const name = (req.body.name || '').trim()
   if (!name) return res.status(400).json({ error: '专栏名称不能为空' })
-  const cats = readCategories()
-  if (cats.includes(name)) return res.status(409).json({ error: '专栏已存在' })
-  cats.push(name)
-  writeCategories(cats)
-  res.json({ name, categories: cats })
+  try {
+    await pool.query('INSERT IGNORE INTO categories (name) VALUES (?)', [name])
+    const [rows] = await pool.query('SELECT name FROM categories ORDER BY id ASC')
+    res.json({ name, categories: rows.map(r => r.name) })
+  } catch (err) {
+    if (err.code === 'ER_DUP_ENTRY') {
+      return res.status(409).json({ error: '专栏已存在' })
+    }
+    res.status(500).json({ error: '创建专栏失败', message: err.message })
+  }
 })
 
 /** DELETE /api/categories/:name — 删除专栏 */
-router.delete('/:name', (req, res) => {
+router.delete('/:name', async (req, res) => {
   const name = decodeURIComponent(req.params.name)
-  const cats = readCategories()
-  const idx = cats.indexOf(name)
-  if (idx === -1) return res.status(404).json({ error: '专栏不存在' })
-  cats.splice(idx, 1)
-  writeCategories(cats)
-  res.json({ deleted: name, categories: cats })
+  try {
+    const [result] = await pool.query('DELETE FROM categories WHERE name = ?', [name])
+    if (result.affectedRows === 0) return res.status(404).json({ error: '专栏不存在' })
+    const [rows] = await pool.query('SELECT name FROM categories ORDER BY id ASC')
+    res.json({ deleted: name, categories: rows.map(r => r.name) })
+  } catch (err) {
+    res.status(500).json({ error: '删除专栏失败', message: err.message })
+  }
 })
 
 export default router

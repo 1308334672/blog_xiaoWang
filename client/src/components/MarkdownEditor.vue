@@ -22,7 +22,20 @@
       <div class="toolbar-sep"></div>
       <div class="toolbar-group">
         <button type="button" class="tb-btn" title="链接 Ctrl+K" @click="insertLink">🔗</button>
-        <button type="button" class="tb-btn" title="图片" @click="insertImage">🖼️</button>
+        <button
+          type="button"
+          class="tb-btn"
+          title="上传图片（JPG/PNG/GIF/WebP/SVG，≤5MB）"
+          :disabled="uploadLoading"
+          @click="triggerImageUpload"
+        >{{ uploadLoading ? '…' : '🖼️' }}</button>
+        <input
+          ref="fileInputEl"
+          type="file"
+          accept="image/jpeg,image/png,image/gif,image/webp,image/svg+xml"
+          style="display:none"
+          @change="handleImageUpload"
+        />
         <button type="button" class="tb-btn" title="表格" @click="insertTable">⊞</button>
       </div>
       <div class="toolbar-sep"></div>
@@ -89,15 +102,18 @@
 import { ref, computed, nextTick } from 'vue'
 import { marked } from 'marked'
 import hljs from 'highlight.js'
+import { uploadApi } from '../api/posts.js'
 
 const props = defineProps({
   modelValue: { type: String, default: '' }
 })
 const emit = defineEmits(['update:modelValue'])
 
-const textareaEl = ref(null)
-const viewMode = ref('edit')   // 'edit' | 'split' | 'preview'
+const textareaEl   = ref(null)
+const fileInputEl  = ref(null)
+const viewMode     = ref('edit')   // 'edit' | 'split' | 'preview'
 const isFullscreen = ref(false)
+const uploadLoading = ref(false)
 
 // marked 配置（与 BlogDetail 保持一致）
 marked.setOptions({
@@ -205,7 +221,28 @@ function insertLink() {
   })
 }
 
+function triggerImageUpload() {
+  fileInputEl.value?.click()
+}
+
+async function handleImageUpload(e) {
+  const file = e.target.files?.[0]
+  if (!file) return
+  // 重置 input，允许重复选同一文件
+  fileInputEl.value.value = ''
+  uploadLoading.value = true
+  try {
+    const data = await uploadApi.image(file)
+    insertRaw(`\n![图片](${data.url})\n`)
+  } catch (err) {
+    alert('图片上传失败: ' + (err.response?.data?.error || err.message))
+  } finally {
+    uploadLoading.value = false
+  }
+}
+
 function insertImage() {
+  // 保留fallback：直接插入 Markdown 占位符（兼容旧调用）
   insertRaw('\n![alt text](image-url)\n')
 }
 

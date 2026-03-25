@@ -1,64 +1,35 @@
 import express from 'express'
-import { readFileSync, existsSync } from 'fs'
-import { dirname, join } from 'path'
-import { fileURLToPath } from 'url'
 import { v4 as uuidv4 } from 'uuid'
-import { readPosts, writePosts } from '../models/postModel.js'
+import pool from '../db/index.js'
+import {
+  readPostsPaged,
+  countPosts,
+  findPostById,
+  createPost,
+  updatePost,
+  deletePost
+} from '../models/postModel.js'
 
 const router = express.Router()
-const __dirname = dirname(fileURLToPath(import.meta.url))
-const CATEGORIES_FILE = join(__dirname, '../data/categories.json')
-const DEFAULT_CATEGORIES = ['前端开发', '后端开发', 'CSS技巧', '学习笔记', '生活随记', '未分类']
-
-function readCategoryNames() {
-  try {
-    if (!existsSync(CATEGORIES_FILE)) return [...DEFAULT_CATEGORIES]
-    const categories = JSON.parse(readFileSync(CATEGORIES_FILE, 'utf-8'))
-    return Array.isArray(categories) ? categories : [...DEFAULT_CATEGORIES]
-  } catch {
-    return [...DEFAULT_CATEGORIES]
-  }
-}
 
 /**
  * GET /api/posts
  * 获取文章列表，支持分页和搜索
  */
-router.get('/', (req, res) => {
+router.get('/', async (req, res) => {
   try {
     const { page = 1, limit = 10, search = '', category = '' } = req.query
-    let posts = readPosts()
 
-    // 按搜索关键词过滤
-    if (search) {
-      const keyword = search.toLowerCase()
-      posts = posts.filter(p =>
-        p.title.toLowerCase().includes(keyword) ||
-        p.summary?.toLowerCase().includes(keyword) ||
-        p.content.toLowerCase().includes(keyword)
-      )
-    }
+    const [posts, total] = await Promise.all([
+      readPostsPaged({ search, category, page, limit }),
+      countPosts({ search, category })
+    ])
 
-    // 按分类过滤
-    if (category) {
-      posts = posts.filter(p => p.category === category)
-    }
-
-    // 按创建时间倒序排列
-    posts.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-
-    // 分页
-    const pageNum = parseInt(page)
+    const pageNum  = parseInt(page)
     const limitNum = parseInt(limit)
-    const total = posts.length
-    const start = (pageNum - 1) * limitNum
-    const paginatedPosts = posts.slice(start, start + limitNum)
-
-    // 列表页不返回完整 content，节省流量
-    const list = paginatedPosts.map(({ content, ...rest }) => rest)
 
     res.json({
-      posts: list,
+      posts,
       total,
       page: pageNum,
       limit: limitNum,
@@ -73,31 +44,34 @@ router.get('/', (req, res) => {
  * GET /api/posts/categories
  * 获取所有分类及文章数量（必须在 /:id 之前注册）
  */
-router.get('/categories', (req, res) => {
+router.get('/categories', async (req, res) => {
   try {
-    const posts = readPosts()
-    const categoryNames = readCategoryNames()
-    const catMap = {}
+    const [[catRows], [postRows]] = await Promise.all([
+      pool.query('SELECT name FROM categories ORDER BY id ASC'),
+      pool.query('SELECT category, title, created_at FROM posts ORDER BY created_at DESC')
+    ])
 
-    categoryNames.forEach(name => {
-      catMap[name] = { name, count: 0, latestAt: null, latestTitle: '' }
+    const catMap = {}
+    catRows.forEach(r => {
+      catMap[r.name] = { name: r.name, count: 0, latestAt: null, latestTitle: '' }
     })
 
-    posts.forEach(post => {
+    postRows.forEach(post => {
       const cat = post.category || '未分类'
       if (!catMap[cat]) catMap[cat] = { name: cat, count: 0, latestAt: null, latestTitle: '' }
       catMap[cat].count++
-      if (!catMap[cat].latestAt || new Date(post.createdAt) > new Date(catMap[cat].latestAt)) {
-        catMap[cat].latestAt = post.createdAt
+      if (!catMap[cat].latestAt) {
+        catMap[cat].latestAt    = post.created_at instanceof Date ? post.created_at.toISOString() : post.created_at
         catMap[cat].latestTitle = post.title
       }
     })
-    res.json(
-      Object.values(catMap).sort((a, b) => {
-        if (b.count !== a.count) return b.count - a.count
-        return a.name.localeCompare(b.name, 'zh-CN')
-      })
-    )
+
+    const result = Object.values(catMap).sort((a, b) => {
+      if (b.count !== a.count) return b.count - a.count
+      return a.name.localeCompare(b.name, 'zh-CN')
+    })
+
+    res.json(result)
   } catch (err) {
     res.status(500).json({ error: '获取分类失败', message: err.message })
   }
@@ -107,13 +81,10 @@ router.get('/categories', (req, res) => {
  * GET /api/posts/:id
  * 获取单篇文章详情
  */
-router.get('/:id', (req, res) => {
+router.get('/:id', async (req, res) => {
   try {
-    const posts = readPosts()
-    const post = posts.find(p => p.id === req.params.id)
-    if (!post) {
-      return res.status(404).json({ error: '文章不存在' })
-    }
+    const post = await findPostById(req.params.id)
+    if (!post) return res.status(404).json({ error: '文章不存在' })
     res.json(post)
   } catch (err) {
     res.status(500).json({ error: '获取文章失败', message: err.message })
@@ -124,7 +95,7 @@ router.get('/:id', (req, res) => {
  * POST /api/posts
  * 创建新文章
  */
-router.post('/', (req, res) => {
+router.post('/', async (req, res) => {
   try {
     const { title, content, summary = '', category = '未分类', tags = [] } = req.body
 
@@ -132,23 +103,19 @@ router.post('/', (req, res) => {
       return res.status(400).json({ error: '标题和内容不能为空' })
     }
 
-    const posts = readPosts()
-    const now = new Date().toISOString()
-
+    const now     = new Date().toISOString()
     const newPost = {
-      id: uuidv4(),
+      id:        uuidv4(),
       title,
-      summary: summary || content.substring(0, 100) + '...',
+      summary:   summary || content.substring(0, 100) + '...',
       content,
       category,
-      tags: Array.isArray(tags) ? tags : tags.split(',').map(t => t.trim()),
+      tags:      Array.isArray(tags) ? tags : tags.split(',').map(t => t.trim()),
       createdAt: now,
       updatedAt: now
     }
 
-    posts.unshift(newPost)
-    writePosts(posts)
-
+    await createPost(newPost)
     res.status(201).json({ message: '文章创建成功', post: newPost })
   } catch (err) {
     res.status(500).json({ error: '创建文章失败', message: err.message })
@@ -159,31 +126,20 @@ router.post('/', (req, res) => {
  * PUT /api/posts/:id
  * 更新文章
  */
-router.put('/:id', (req, res) => {
+router.put('/:id', async (req, res) => {
   try {
-    const posts = readPosts()
-    const index = posts.findIndex(p => p.id === req.params.id)
-
-    if (index === -1) {
-      return res.status(404).json({ error: '文章不存在' })
-    }
+    const existing = await findPostById(req.params.id)
+    if (!existing) return res.status(404).json({ error: '文章不存在' })
 
     const { title, content, summary, category, tags } = req.body
-    const updated = {
-      ...posts[index],
-      ...(title !== undefined && { title }),
-      ...(content !== undefined && { content }),
-      ...(summary !== undefined && { summary }),
-      ...(category !== undefined && { category }),
-      ...(tags !== undefined && {
-        tags: Array.isArray(tags) ? tags : tags.split(',').map(t => t.trim())
-      }),
-      updatedAt: new Date().toISOString()
-    }
+    const fields = {}
+    if (title    !== undefined) fields.title    = title
+    if (content  !== undefined) fields.content  = content
+    if (summary  !== undefined) fields.summary  = summary
+    if (category !== undefined) fields.category = category
+    if (tags     !== undefined) fields.tags     = Array.isArray(tags) ? tags : tags.split(',').map(t => t.trim())
 
-    posts[index] = updated
-    writePosts(posts)
-
+    const updated = await updatePost(req.params.id, fields)
     res.json({ message: '文章更新成功', post: updated })
   } catch (err) {
     res.status(500).json({ error: '更新文章失败', message: err.message })
@@ -194,18 +150,12 @@ router.put('/:id', (req, res) => {
  * DELETE /api/posts/:id
  * 删除文章
  */
-router.delete('/:id', (req, res) => {
+router.delete('/:id', async (req, res) => {
   try {
-    const posts = readPosts()
-    const index = posts.findIndex(p => p.id === req.params.id)
+    const post = await findPostById(req.params.id)
+    if (!post) return res.status(404).json({ error: '文章不存在' })
 
-    if (index === -1) {
-      return res.status(404).json({ error: '文章不存在' })
-    }
-
-    posts.splice(index, 1)
-    writePosts(posts)
-
+    await deletePost(req.params.id)
     res.json({ message: '文章删除成功' })
   } catch (err) {
     res.status(500).json({ error: '删除文章失败', message: err.message })
@@ -213,3 +163,6 @@ router.delete('/:id', (req, res) => {
 })
 
 export default router
+
+
+
