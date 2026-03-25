@@ -698,8 +698,8 @@ function showToast(message, type = 'success') {
 .wr-topbar {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 10px 16px;
+  gap: 14px;
+  padding: 14px 24px;
   border-bottom: 2px solid var(--pixel-border);
   background: rgba(0,10,5,0.9);
   flex-shrink: 0;
@@ -710,8 +710,8 @@ function showToast(message, type = 'success') {
   border: 2px solid var(--pixel-border);
   color: var(--color-cyan);
   font-family: 'Press Start 2P', monospace;
-  font-size: 0.55rem;
-  padding: 8px 12px;
+  font-size: 0.7rem;
+  padding: 10px 16px;
   cursor: none;
   white-space: nowrap;
   transition: all 0.1s steps(2);
@@ -729,8 +729,8 @@ function showToast(message, type = 'success') {
   border-bottom: 2px solid var(--pixel-border);
   color: var(--color-text-primary);
   font-family: 'Press Start 2P', monospace;
-  font-size: 0.9rem;
-  padding: 6px 10px;
+  font-size: 1.1rem;
+  padding: 10px 14px;
   outline: none;
   min-width: 0;
 }
@@ -749,10 +749,10 @@ function showToast(message, type = 'success') {
   border: 2px solid var(--pixel-border);
   color: var(--color-text-primary);
   font-family: 'Press Start 2P', monospace;
-  font-size: 0.55rem;
-  padding: 8px 10px;
+  font-size: 0.7rem;
+  padding: 10px 14px;
   cursor: none;
-  max-width: 160px;
+  max-width: 200px;
 }
 .wr-select:focus { outline: none; border-color: var(--color-green); }
 .wr-add-col-btn {
@@ -760,9 +760,9 @@ function showToast(message, type = 'success') {
   border: 2px solid var(--color-cyan);
   color: var(--color-cyan);
   font-family: 'Press Start 2P', monospace;
-  font-size: 0.7rem;
-  width: 30px;
-  height: 30px;
+  font-size: 0.85rem;
+  width: 36px;
+  height: 36px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -795,10 +795,10 @@ function showToast(message, type = 'success') {
   border-bottom: 2px solid var(--pixel-border);
   color: var(--color-text-primary);
   font-family: 'Press Start 2P', monospace;
-  font-size: 0.5rem;
-  padding: 4px 8px;
+  font-size: 0.65rem;
+  padding: 6px 10px;
   outline: none;
-  width: 140px;
+  width: 180px;
 }
 .quick-add-input:focus { border-bottom-color: var(--color-cyan); }
 
@@ -807,8 +807,8 @@ function showToast(message, type = 'success') {
 /* 副信息栏（tags / summary） */
 .wr-meta {
   display: flex;
-  gap: 10px;
-  padding: 6px 16px;
+  gap: 14px;
+  padding: 10px 24px;
   border-bottom: 1px dashed var(--pixel-border);
   background: rgba(0,10,5,0.7);
   flex-shrink: 0;
@@ -820,17 +820,17 @@ function showToast(message, type = 'success') {
   border-bottom: 1px solid var(--pixel-border);
   color: var(--color-text-secondary);
   font-family: 'Press Start 2P', monospace;
-  font-size: 0.5rem;
-  padding: 5px 8px;
+  font-size: 0.65rem;
+  padding: 8px 10px;
   outline: none;
 }
 .wr-meta-input::placeholder { color: var(--color-text-muted); }
 .wr-meta-input:focus { border-bottom-color: var(--color-cyan); color: var(--color-text-primary); }
 
 .wr-error {
-  font-size: 0.55rem;
+  font-size: 0.65rem;
   color: var(--color-accent);
-  padding: 6px 16px;
+  padding: 8px 24px;
   background: rgba(255,107,157,0.1);
   flex-shrink: 0;
 }
