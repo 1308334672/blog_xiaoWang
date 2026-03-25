@@ -3,6 +3,7 @@ import cors from 'cors'
 import bodyParser from 'body-parser'
 import postsRouter from './routes/posts.js'
 import authRouter from './routes/auth.js'
+import categoriesRouter from './routes/categories.js'
 
 const app = express()
 const PORT = process.env.PORT || 3001
@@ -52,6 +53,7 @@ app.use(bodyParser.urlencoded({ extended: true }))
 // API 路由
 app.use('/api/posts', postsRouter)
 app.use('/api/auth', authRouter)
+app.use('/api/categories', categoriesRouter)
 
 // 健康检查
 app.get('/api/health', (req, res) => {

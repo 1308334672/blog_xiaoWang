@@ -38,3 +38,16 @@ export const postsApi = {
     return http.delete(`/posts/${id}`).then(r => r.data)
   }
 }
+
+// 专栏 API
+export const categoriesApi = {
+  getAll() {
+    return http.get('/categories').then(r => r.data)
+  },
+  add(name) {
+    return http.post('/categories', { name }).then(r => r.data)
+  },
+  remove(name) {
+    return http.delete(`/categories/${encodeURIComponent(name)}`).then(r => r.data)
+  }
+}
