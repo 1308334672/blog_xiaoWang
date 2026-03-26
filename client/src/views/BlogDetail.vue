@@ -80,8 +80,13 @@ const renderedContent = computed(() => {
   let html = marked(currentPost.value.content)
   // 将相对路径 /uploads/ 替换为后端完整地址
   html = html.replace(/src="\/uploads\//g, `src="${apiBase}/uploads/`)
-  // 给所有 img 标签注入内联样式，确保图片不会超出容器
-  html = html.replace(/<img /g, '<img style="max-width:100%;height:auto;display:block" ')
+  // 移除 img 上可能存在的固定 width/height 属性，然后注入强制缩放样式
+  html = html.replace(/<img\s[^>]*>/g, (match) => {
+    let tag = match.replace(/\s(width|height)\s*=\s*["'][^"']*["']/gi, '')
+    tag = tag.replace(/style\s*=\s*["'][^"']*["']/gi, '')
+    tag = tag.replace(/<img\s/i, '<img style="max-width:100%;width:100%;height:auto;display:block;object-fit:contain" ')
+    return tag
+  })
   return html
 })
 
