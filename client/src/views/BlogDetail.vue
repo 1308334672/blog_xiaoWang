@@ -93,26 +93,39 @@ const renderedContent = computed(() => {
 // 图片加载后按真实宽高决定是否缩放
 function constrainImages() {
   nextTick(() => {
-    if (!markdownBodyRef.value) return
+    console.log('[constrainImages] nextTick fired')
+    if (!markdownBodyRef.value) {
+      console.warn('[constrainImages] markdownBodyRef.value is null, abort')
+      return
+    }
     const container = markdownBodyRef.value
     const imgs = container.querySelectorAll('img')
-    imgs.forEach((img) => {
+    console.log(`[constrainImages] container.clientWidth=${container.clientWidth}, found ${imgs.length} img(s)`)
+
+    imgs.forEach((img, i) => {
       const applyConstraint = () => {
         const maxW = container.clientWidth
+        console.log(`[constrainImages] img[${i}] src=${img.src}`)
+        console.log(`[constrainImages] img[${i}] naturalWidth=${img.naturalWidth}, naturalHeight=${img.naturalHeight}`)
+        console.log(`[constrainImages] img[${i}] container.clientWidth=${maxW}`)
         if (img.naturalWidth > maxW) {
           const ratio = maxW / img.naturalWidth
           img.style.width = maxW + 'px'
           img.style.height = Math.round(img.naturalHeight * ratio) + 'px'
+          console.log(`[constrainImages] img[${i}] SCALED → width=${img.style.width}, height=${img.style.height}`)
         } else {
           img.style.width = img.naturalWidth + 'px'
           img.style.height = img.naturalHeight + 'px'
+          console.log(`[constrainImages] img[${i}] KEPT original size → width=${img.style.width}, height=${img.style.height}`)
         }
         img.style.display = 'block'
         img.style.margin = '1em auto'
       }
       if (img.complete && img.naturalWidth) {
+        console.log(`[constrainImages] img[${i}] already complete, applying now`)
         applyConstraint()
       } else {
+        console.log(`[constrainImages] img[${i}] not loaded yet, waiting for load event`)
         img.addEventListener('load', applyConstraint)
       }
     })
