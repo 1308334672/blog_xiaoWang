@@ -33,7 +33,7 @@
       <!-- 文章正文 -->
       <div class="article-body container">
         <div class="article-content glass-card">
-          <div class="markdown-body" v-html="renderedContent"></div>
+          <div class="markdown-body" ref="markdownBodyRef" v-html="renderedContent"></div>
         </div>
 
         <!-- 文章底部导航 -->
@@ -47,7 +47,7 @@
 </template>
 
 <script setup>
-import { computed, onMounted, watch } from 'vue'
+import { computed, onMounted, watch, ref, nextTick } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { usePostsStore } from '../store/posts.js'
 import { storeToRefs } from 'pinia'
@@ -60,6 +60,7 @@ const route = useRoute()
 const router = useRouter()
 const postsStore = usePostsStore()
 const { currentPost, loading, error } = storeToRefs(postsStore)
+const markdownBodyRef = ref(null)
 
 // 配置 marked 代码高亮
 marked.setOptions({
@@ -80,15 +81,43 @@ const renderedContent = computed(() => {
   let html = marked(currentPost.value.content)
   // 将相对路径 /uploads/ 替换为后端完整地址
   html = html.replace(/src="\/uploads\//g, `src="${apiBase}/uploads/`)
-  // 移除 img 上可能存在的固定 width/height 属性，然后注入强制缩放样式
+  // 只清除原始 width/height 属性，不强制设置宽度（由 JS 按实际尺寸处理）
   html = html.replace(/<img\s[^>]*>/g, (match) => {
     let tag = match.replace(/\s(width|height)\s*=\s*["'][^"']*["']/gi, '')
     tag = tag.replace(/style\s*=\s*["'][^"']*["']/gi, '')
-    tag = tag.replace(/<img\s/i, '<img style="max-width:100%;width:100%;height:auto;display:block;object-fit:contain" ')
     return tag
   })
   return html
 })
+
+// 图片加载后按真实宽高决定是否缩放
+function constrainImages() {
+  nextTick(() => {
+    if (!markdownBodyRef.value) return
+    const container = markdownBodyRef.value
+    const imgs = container.querySelectorAll('img')
+    imgs.forEach((img) => {
+      const applyConstraint = () => {
+        const maxW = container.clientWidth
+        if (img.naturalWidth > maxW) {
+          const ratio = maxW / img.naturalWidth
+          img.style.width = maxW + 'px'
+          img.style.height = Math.round(img.naturalHeight * ratio) + 'px'
+        } else {
+          img.style.width = img.naturalWidth + 'px'
+          img.style.height = img.naturalHeight + 'px'
+        }
+        img.style.display = 'block'
+        img.style.margin = '1em auto'
+      }
+      if (img.complete && img.naturalWidth) {
+        applyConstraint()
+      } else {
+        img.addEventListener('load', applyConstraint)
+      }
+    })
+  })
+}
 
 // 加载文章
 function loadPost() {
@@ -99,6 +128,9 @@ onMounted(loadPost)
 
 // 路由参数变化时重新加载
 watch(() => route.params.id, loadPost)
+
+// 文章内容渲染后约束图片尺寸
+watch(renderedContent, constrainImages)
 
 // 格式化日期（使用共享工具函数）
 function formatDate(dateStr) {
@@ -199,13 +231,7 @@ function formatDate(dateStr) {
 }
 
 .article-content :deep(img) {
-  max-width: 100% !important;
-  width: auto;
-  height: auto !important;
-  display: block;
-  margin: 1em auto;
   border: 2px solid var(--pixel-border);
-  border-radius: 4px;
   box-sizing: border-box;
   cursor: zoom-in;
   object-fit: contain;
