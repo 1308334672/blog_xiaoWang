@@ -180,11 +180,13 @@ function formatDate(dateStr) {
   padding: 32px 40px;
   max-width: 860px;
   margin: 0 auto;
+  overflow-x: hidden;
 }
 
 .article-content :deep(img) {
-  max-width: 100%;
-  height: auto;
+  max-width: 100% !important;
+  width: auto;
+  height: auto !important;
   display: block;
   margin: 1em auto;
   border: 2px solid var(--pixel-border);

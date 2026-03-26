@@ -129,7 +129,10 @@ marked.setOptions({
 
 const renderedHtml = computed(() => {
   try {
-    return marked(props.modelValue || '')
+    const apiBase = import.meta.env.VITE_API_BASE?.replace('/api', '') || ''
+    const html = marked(props.modelValue || '')
+    // 将相对路径 /uploads/ 解析为后端完整地址，与 BlogDetail 保持一致
+    return html.replace(/src="\/uploads\//g, `src="${apiBase}/uploads/`)
   } catch {
     return '<p style="color:#ff6b9d">渲染出错</p>'
   }
@@ -397,6 +400,7 @@ function insertHRule() {
 .md-preview {
   flex: 1;
   overflow-y: auto;
+  overflow-x: hidden;
   padding: 24px 28px;
   font-family: 'Courier New', Courier, monospace;
   font-size: 1rem;
@@ -422,8 +426,9 @@ function insertHRule() {
 .md-preview :deep(a:hover) { text-decoration: underline; }
 
 .md-preview :deep(img) {
-  max-width: 100%;
-  height: auto;
+  max-width: 100% !important;
+  width: auto;
+  height: auto !important;
   display: block;
   margin: 1em auto;
   border: 2px solid var(--pixel-border);
@@ -483,11 +488,6 @@ function insertHRule() {
   margin: 0.6em 0;
 }
 .md-preview :deep(li) { margin: 0.3em 0; }
-
-.md-preview :deep(img) {
-  max-width: 100%;
-  border: 2px solid var(--pixel-border);
-}
 
 .md-preview :deep(hr) {
   border: none;
