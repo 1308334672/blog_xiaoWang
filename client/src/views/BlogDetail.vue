@@ -182,6 +182,16 @@ function formatDate(dateStr) {
   margin: 0 auto;
 }
 
+.article-content :deep(img) {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: 1em auto;
+  border: 2px solid var(--pixel-border);
+  border-radius: 4px;
+  cursor: zoom-in;
+}
+
 .article-nav {
   display: flex;
   justify-content: space-between;

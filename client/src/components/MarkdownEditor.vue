@@ -421,6 +421,15 @@ function insertHRule() {
 .md-preview :deep(a) { color: var(--color-cyan); }
 .md-preview :deep(a:hover) { text-decoration: underline; }
 
+.md-preview :deep(img) {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: 1em auto;
+  border: 2px solid var(--pixel-border);
+  border-radius: 4px;
+}
+
 .md-preview :deep(code) {
   background: rgba(0,255,65,0.08);
   border: 1px solid var(--pixel-border);
