@@ -51,7 +51,9 @@ const router = express.Router()
  */
 router.post('/', upload.single('image'), (req, res) => {
   if (!req.file) return res.status(400).json({ error: '未收到文件' })
-  res.json({ url: `/uploads/${req.file.filename}` })
+  // 生产环境返回绝对 URL，开发环境返回相对路径（由 Vite 代理转发）
+  const host = process.env.STATIC_HOST || ''
+  res.json({ url: `${host}/uploads/${req.file.filename}` })
 })
 
 // multer 错误统一处理

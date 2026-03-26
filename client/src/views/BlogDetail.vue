@@ -76,7 +76,10 @@ marked.setOptions({
 // 渲染后的 HTML 内容
 const renderedContent = computed(() => {
   if (!currentPost.value?.content) return ''
-  return marked(currentPost.value.content)
+  const apiBase = import.meta.env.VITE_API_BASE?.replace('/api', '') || ''
+  const html = marked(currentPost.value.content)
+  // 将相对路径 /uploads/ 替换为后端完整地址
+  return html.replace(/src="\/uploads\//g, `src="${apiBase}/uploads/`)
 })
 
 // 加载文章

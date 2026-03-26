@@ -104,7 +104,7 @@ export async function updatePost(id, fields) {
   if (sets.length === 0) return findPostById(id)
 
   sets.push('updated_at = ?')
-  values.push(new Date().toISOString())
+  values.push(new Date())
   values.push(id)
 
   await pool.query(`UPDATE posts SET ${sets.join(', ')} WHERE id = ?`, values)

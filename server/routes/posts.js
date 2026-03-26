@@ -103,7 +103,7 @@ router.post('/', async (req, res) => {
       return res.status(400).json({ error: '标题和内容不能为空' })
     }
 
-    const now     = new Date().toISOString()
+    const now     = new Date()
     const newPost = {
       id:        uuidv4(),
       title,
