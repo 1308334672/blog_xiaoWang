@@ -349,6 +349,8 @@ textarea.input-field {
   line-height: 2.2;
   font-family: 'Courier New', monospace;
   font-size: 14px;
+  overflow: hidden;
+  word-break: break-word;
 }
 
 .markdown-body h1,
@@ -429,6 +431,7 @@ textarea.input-field {
   display: block;
   margin: 1em auto;
   border: 2px solid var(--pixel-border);
+  box-sizing: border-box;
 }
 
 .markdown-body hr {

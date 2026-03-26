@@ -180,7 +180,8 @@ function formatDate(dateStr) {
   padding: 32px 40px;
   max-width: 1100px;
   margin: 0 auto;
-  overflow-x: hidden;
+  overflow: hidden;
+  word-break: break-word;
 }
 
 .article-content :deep(img) {
@@ -191,6 +192,7 @@ function formatDate(dateStr) {
   margin: 1em auto;
   border: 2px solid var(--pixel-border);
   border-radius: 4px;
+  box-sizing: border-box;
   cursor: zoom-in;
 }
 

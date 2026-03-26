@@ -348,6 +348,7 @@ function insertHRule() {
   display: flex;
   flex-direction: column;
   flex: 1;
+  min-width: 0;
   overflow: hidden;
   border-right: 1px solid var(--pixel-border);
 }
@@ -399,6 +400,8 @@ function insertHRule() {
 /* ─── 预览区 ─────────────────────────────── */
 .md-preview {
   flex: 1;
+  min-width: 0;
+  width: 100%;
   overflow-y: auto;
   overflow-x: hidden;
   padding: 24px 28px;
@@ -433,6 +436,7 @@ function insertHRule() {
   margin: 1em auto;
   border: 2px solid var(--pixel-border);
   border-radius: 4px;
+  box-sizing: border-box;
 }
 
 .md-preview :deep(code) {
