@@ -422,6 +422,15 @@ textarea.input-field {
   text-decoration: underline;
 }
 
+.markdown-body img {
+  max-width: 100%;
+  width: auto;
+  height: auto;
+  display: block;
+  margin: 1em auto;
+  border: 2px solid var(--pixel-border);
+}
+
 .markdown-body hr {
   border: none;
   border-top: 3px dashed var(--pixel-border);

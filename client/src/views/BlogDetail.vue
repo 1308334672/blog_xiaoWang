@@ -178,7 +178,7 @@ function formatDate(dateStr) {
 
 .article-content {
   padding: 32px 40px;
-  max-width: 860px;
+  max-width: 1100px;
   margin: 0 auto;
   overflow-x: hidden;
 }
@@ -198,7 +198,7 @@ function formatDate(dateStr) {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  max-width: 860px;
+  max-width: 1100px;
   margin: 32px auto 0;
   padding: 0 4px;
 }
@@ -215,8 +215,12 @@ function formatDate(dateStr) {
 }
 
 @media (max-width: 768px) {
+  .article-body {
+    padding: 0 12px 60px;
+  }
+
   .article-content {
-    padding: 20px 16px;
+    padding: 16px 12px;
   }
 
   .article-nav {
