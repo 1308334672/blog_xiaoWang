@@ -165,9 +165,8 @@
                 >VIEW</button>
                 <button
                   class="btn btn-danger btn-sm"
-                  :disabled="col.postCount > 0"
-                  :title="col.postCount > 0 ? '请先删除该专栏下的所有文章' : '删除专栏'"
-                  @click="deleteColumn(col.name)"
+                  :title="col.postCount > 0 ? `该专栏下有 ${col.postCount} 篇文章，删除后文章将变为未分类` : '删除专栏'"
+                  @click="deleteColumn(col.name, col.postCount)"
                 >DEL</button>
               </span>
             </div>
@@ -316,14 +315,18 @@ async function addColumn() {
   }
 }
 
-async function deleteColumn(name) {
-  if (!confirm(`确定删除专栏「${name}」？`)) return
+async function deleteColumn(name, postCount = 0) {
+  const msg = postCount > 0
+    ? `专栏「${name}」下还有 ${postCount} 篇文章，删除后文章将变为未分类，确定删除？`
+    : `确定删除专栏「${name}」？`
+  if (!confirm(msg)) return
   columnsLoading.value = true
   try {
     await categoriesApi.remove(name)
     showToast(`专栏「${name}」已删除`)
     await loadColumnStats()
   } catch (err) {
+    console.error('删除专栏失败:', err)
     showToast(err.response?.data?.error || '删除失败', 'error')
   } finally {
     columnsLoading.value = false

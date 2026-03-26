@@ -31,7 +31,7 @@ router.post('/', async (req, res) => {
 
 /** DELETE /api/categories/:name — 删除专栏 */
 router.delete('/:name', async (req, res) => {
-  const name = decodeURIComponent(req.params.name)
+  const name = req.params.name
   try {
     const [result] = await pool.query('DELETE FROM categories WHERE name = ?', [name])
     if (result.affectedRows === 0) return res.status(404).json({ error: '专栏不存在' })

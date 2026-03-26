@@ -77,9 +77,12 @@ marked.setOptions({
 const renderedContent = computed(() => {
   if (!currentPost.value?.content) return ''
   const apiBase = import.meta.env.VITE_API_BASE?.replace('/api', '') || ''
-  const html = marked(currentPost.value.content)
+  let html = marked(currentPost.value.content)
   // 将相对路径 /uploads/ 替换为后端完整地址
-  return html.replace(/src="\/uploads\//g, `src="${apiBase}/uploads/`)
+  html = html.replace(/src="\/uploads\//g, `src="${apiBase}/uploads/`)
+  // 给所有 img 标签注入内联样式，确保图片不会超出容器
+  html = html.replace(/<img /g, '<img style="max-width:100%;height:auto;display:block" ')
+  return html
 })
 
 // 加载文章

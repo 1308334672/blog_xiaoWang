@@ -130,9 +130,12 @@ marked.setOptions({
 const renderedHtml = computed(() => {
   try {
     const apiBase = import.meta.env.VITE_API_BASE?.replace('/api', '') || ''
-    const html = marked(props.modelValue || '')
+    let html = marked(props.modelValue || '')
     // 将相对路径 /uploads/ 解析为后端完整地址，与 BlogDetail 保持一致
-    return html.replace(/src="\/uploads\//g, `src="${apiBase}/uploads/`)
+    html = html.replace(/src="\/uploads\//g, `src="${apiBase}/uploads/`)
+    // 给所有 img 标签注入内联样式，确保图片不会超出容器
+    html = html.replace(/<img /g, '<img style="max-width:100%;height:auto;display:block" ')
+    return html
   } catch {
     return '<p style="color:#ff6b9d">渲染出错</p>'
   }
