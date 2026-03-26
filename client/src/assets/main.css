@@ -64,6 +64,12 @@
   cursor: none !important;
 }
 
+/* 文章内图片用正常渲染，避免大图缩放模糊/溢出 */
+.markdown-body img,
+.article-content img {
+  image-rendering: auto;
+}
+
 /* 移动端恢复默认光标 */
 @media (hover: none) and (pointer: coarse) {
   *, *::before, *::after {

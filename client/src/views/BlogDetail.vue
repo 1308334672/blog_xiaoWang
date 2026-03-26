@@ -187,6 +187,12 @@ function formatDate(dateStr) {
   word-break: break-word;
 }
 
+.article-content :deep(.markdown-body) {
+  max-width: 100%;
+  overflow: hidden;
+  word-break: break-word;
+}
+
 .article-content :deep(img) {
   max-width: 100% !important;
   width: auto;
@@ -197,6 +203,7 @@ function formatDate(dateStr) {
   border-radius: 4px;
   box-sizing: border-box;
   cursor: zoom-in;
+  object-fit: contain;
 }
 
 .article-nav {
